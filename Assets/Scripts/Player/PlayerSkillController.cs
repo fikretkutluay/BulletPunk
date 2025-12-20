@@ -156,24 +156,25 @@ public class PlayerSkillController : MonoBehaviour
     public void SpawnProjectileFromAnim()
     {
         if (lastFiredSkill == null) return;
-
+        
         // >>> SKILL R (ULTIMATE) <<<
         if (lastFiredSkill == skillR)
         {
-            // Cache'lenen renderer'ý kullanýyoruz
             Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
 
-            Collider2D[] allHits = Physics2D.OverlapCircleAll(transform.position, ultiRadius);
+            // 1. FÝLTRE: Sadece "Enemy" layerýndakileri getir (Performans için)
+            // "enemyLayer" deðiþkenini Inspector'dan seçmeyi unutma!
+            Collider2D[] allHits = Physics2D.OverlapCircleAll(transform.position, ultiRadius, enemyLayer);
 
             foreach (Collider2D hit in allHits)
             {
-                if (hit.gameObject == gameObject) continue;
-
+                // 2. AÇI KONTROLÜ
                 Vector2 dirToTarget = (hit.transform.position - transform.position).normalized;
-
                 if (Vector2.Angle(facingDir, dirToTarget) < ultiAngle / 2f)
                 {
+                    // 3. INTERFACE KONTROLÜ (Caný var mý?)
                     IDamageable damageable = hit.GetComponentInParent<IDamageable>();
+
                     if (damageable != null)
                     {
                         damageable.TakeDamage(lastFiredSkill.damage);
@@ -242,5 +243,45 @@ public class PlayerSkillController : MonoBehaviour
         Gizmos.DrawRay(transform.position, (rightRot * facingDir) * ultiRadius);
 
         Gizmos.DrawWireSphere(transform.position, ultiRadius);
+    }
+
+    // --- UI ÝÇÝN YENÝ EKLENEN FONKSÝYONLAR ---
+
+    // 1. Bir yeteneðin cooldown oranýný (0 ile 1 arasý) döndürür
+    public float GetCooldownRatio(ControlType type)
+    {
+        float current = 0;
+        float max = 1;
+
+        switch (type)
+        {
+            case ControlType.Skill1: // Q
+                current = cooldownQ_Timer;
+                max = (skillQ != null) ? skillQ.cooldown : 1;
+                break;
+            case ControlType.Skill2: // E
+                current = cooldownE_Timer;
+                max = (skillE != null) ? skillE.cooldown : 1;
+                break;
+            case ControlType.Skill3: // R
+                current = cooldownR_Timer;
+                max = (skillR != null) ? skillR.cooldown : 1;
+                break;
+        }
+
+        // Timer 0 ise oran 0'dýr (Doldu). Timer max ise oran 1'dir.
+        return Mathf.Clamp01(current / max);
+    }
+
+    // 2. Þu an hangi yetenek seçili (Niþan alýnýyor)?
+    public bool IsSkillSelected(ControlType type)
+    {
+        if (!isAiming || currentActiveSkill == null) return false;
+
+        if (type == ControlType.Skill1 && currentActiveSkill == skillQ) return true;
+        if (type == ControlType.Skill2 && currentActiveSkill == skillE) return true;
+        if (type == ControlType.Skill3 && currentActiveSkill == skillR) return true;
+
+        return false;
     }
 }
