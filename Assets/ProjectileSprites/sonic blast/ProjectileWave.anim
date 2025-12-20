@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: lightningAttack
+  m_Name: ProjectileWave
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,19 +21,17 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: -6262819556796767127, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
-    - time: 0.083333336
-      value: {fileID: 8237073753686164483, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
+      value: {fileID: -6030330531702032937, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
     - time: 0.16666667
-      value: {fileID: -2008555748946359393, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
-    - time: 0.25
-      value: {fileID: 1777526206595869681, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
+      value: {fileID: -2956367694775316716, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
+    - time: 0.33333334
+      value: {fileID: 8990723849841846184, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 12
+  m_SampleRate: 6
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -50,16 +48,15 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: -6262819556796767127, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
-    - {fileID: 8237073753686164483, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
-    - {fileID: -2008555748946359393, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
-    - {fileID: 1777526206595869681, guid: bfde820a91c4ef240a7c64422ac45bfb, type: 3}
+    - {fileID: -6030330531702032937, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
+    - {fileID: -2956367694775316716, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
+    - {fileID: 8990723849841846184, guid: ec42f2838bfd30540a7f6c6cc9a39b46, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.33333334
+    m_StopTime: 0.5
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -78,11 +75,4 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events:
-  - time: 0.16666667
-    functionName: SpawnProjectileFromAnim
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
+  m_Events: []
