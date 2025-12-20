@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+
 public enum EnemyType { Fire, Electric, Toxic, Ice }
 
 public class Enemy : MonoBehaviour, IDamageable
@@ -66,6 +67,9 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (player == null) return;
 
+        // 1. FLIP ÝÞLEMÝNÝ BURADA YAPIYORUZ
+        HandleSpriteFlip();
+
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
         if (distanceToPlayer > stoppingDistance)
@@ -83,6 +87,24 @@ public class Enemy : MonoBehaviour, IDamageable
 
         // Keep UI from flipping if you decide to flip the sprite later
         if (healthSlider != null) healthSlider.transform.parent.rotation = Quaternion.identity;
+    }
+
+    // YENÝ EKLENEN FONKSÝYON
+    void HandleSpriteFlip()
+    {
+        // Eðer oyuncu düþmanýn saðýndaysa (x deðeri büyükse)
+        if (player.position.x > transform.position.x)
+        {
+            // Sprite saða baksýn (flipX kapalý)
+            // NOT: Eðer sprite'ýn orijinali sola bakýyorsa burayý true yap.
+            spriteRenderer.flipX = true;
+        }
+        // Eðer oyuncu düþmanýn solundaysa (x deðeri küçükse)
+        else if (player.position.x < transform.position.x)
+        {
+            // Sprite sola baksýn (flipX açýk)
+            spriteRenderer.flipX = false;
+        }
     }
 
     void Shoot()

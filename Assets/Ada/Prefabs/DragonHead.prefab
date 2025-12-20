@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 294012018446387814}
   - component: {fileID: 478677205505918514}
   - component: {fileID: 8982404818864766495}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DragonHead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
