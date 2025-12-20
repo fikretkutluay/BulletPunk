@@ -45,6 +45,6 @@ public class LightningSpell : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, hitRadius);
+        Gizmos.DrawWireSphere(transform.position , hitRadius);
     }
 }

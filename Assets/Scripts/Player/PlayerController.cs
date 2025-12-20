@@ -7,13 +7,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
 
     [Header("Dash (Atýlma) Ayarlarý")]
-    [SerializeField] private float dashSpeed = 20f;       // Atýlma hýzý
-    [SerializeField] private float dashDuration = 0.2f;   // Ne kadar sürecek?
-    [SerializeField] private float dashCooldown = 1f;     // Ne sýklýkla atýlabilir?
-    [SerializeField] private bool invincibleDuringDash = true; // Dash atarken hasar almazlýk olsun mu?
+    [SerializeField] private float dashSpeed = 20f;
+    [SerializeField] private float dashDuration = 0.2f;
+    [SerializeField] private float dashCooldown = 1f;
+    [SerializeField] private bool invincibleDuringDash = true; // Dash atarken hasar almazlýk
 
-    [Header("Efektler ve Katmanlar")]
-    [SerializeField] private TrailRenderer trailRenderer; // Inspector'dan atanacak
+    [Header("Katman Ayarlarý")]
     [SerializeField] private string enemyLayerName = "Enemy"; // Çarpýþmayý kapatacaðýmýz katman adý
 
     // Dash Durum Deðiþkenleri
@@ -34,11 +33,17 @@ public class PlayerMovement : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         if (animator == null) animator = GetComponent<Animator>();
-        if (trailRenderer == null) trailRenderer = GetComponent<TrailRenderer>(); // Eðer ekli ama atanmamýþsa bulmaya çalýþ
 
         // Katman numaralarýný alýyoruz
         playerLayer = gameObject.layer;
         enemyLayer = LayerMask.NameToLayer(enemyLayerName);
+    }
+
+    // Güvenlik: Obje kapanýrsa çarpýþmayý düzelt
+    void OnDisable()
+    {
+        if (enemyLayer != -1)
+            Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
     }
 
     void Update()
@@ -49,7 +54,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // --- DASH GÝRÝÞÝ ---
-        // Space'e basýldý mý? + Cooldown bitti mi? + InputManager izin veriyor mu?
         if (Input.GetKeyDown(KeyCode.Space) && dashTimer <= 0 && InputManager.Instance.IsControlActive(ControlType.Dash))
         {
             StartCoroutine(PerformDash());
@@ -62,21 +66,10 @@ public class PlayerMovement : MonoBehaviour
         float moveX = 0f;
         float moveY = 0f;
 
-        // --- YUKARI (W) ---
-        if (Input.GetKey(KeyCode.W) && InputManager.Instance.IsControlActive(ControlType.MoveUp))
-            moveY = 1f;
-
-        // --- AÞAÐI (S) ---
-        if (Input.GetKey(KeyCode.S) && InputManager.Instance.IsControlActive(ControlType.MoveDown))
-            moveY = -1f;
-
-        // --- SOL (A) ---
-        if (Input.GetKey(KeyCode.A) && InputManager.Instance.IsControlActive(ControlType.MoveLeft))
-            moveX = -1f;
-
-        // --- SAÐ (D) ---
-        if (Input.GetKey(KeyCode.D) && InputManager.Instance.IsControlActive(ControlType.MoveRight))
-            moveX = 1f;
+        if (Input.GetKey(KeyCode.W) && InputManager.Instance.IsControlActive(ControlType.MoveUp)) moveY = 1f;
+        if (Input.GetKey(KeyCode.S) && InputManager.Instance.IsControlActive(ControlType.MoveDown)) moveY = -1f;
+        if (Input.GetKey(KeyCode.A) && InputManager.Instance.IsControlActive(ControlType.MoveLeft)) moveX = -1f;
+        if (Input.GetKey(KeyCode.D) && InputManager.Instance.IsControlActive(ControlType.MoveRight)) moveX = 1f;
 
         movementInput = new Vector2(moveX, moveY).normalized;
 
@@ -88,7 +81,6 @@ public class PlayerMovement : MonoBehaviour
         // --- ANIMASYON GÜNCELLEME ---
         if (animator != null)
         {
-            // Koþma animasyonu için
             animator.SetFloat("moveX", movementInput.magnitude);
         }
     }
@@ -97,6 +89,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (isDashing) return;
 
+        // Unity 6 için linearVelocity, eski sürümler için velocity kullan
         rb.linearVelocity = movementInput * moveSpeed;
     }
 
@@ -106,14 +99,11 @@ public class PlayerMovement : MonoBehaviour
         isDashing = true;
         dashTimer = dashCooldown;
 
-        // 1. Dash Baþlangýcý: Efektleri Aç
-        if (trailRenderer != null) trailRenderer.emitting = true;
-
-        // 2. Dash Baþlangýcý: Animasyonu Tetikle (Önceki konuþmamýzdaki trigger)
+        // 1. Dash Baþlangýcý: Animasyonu Tetikle
         if (animator != null) animator.SetTrigger("Dash");
 
-        // 3. Dash Baþlangýcý: Çarpýþmayý Kapat (Düþmanlarýn içinden geç)
-        if (enemyLayer != -1)
+        // 2. Dash Baþlangýcý: Çarpýþmayý Kapat
+        if (enemyLayer != -1 && invincibleDuringDash)
             Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
 
         // Hangi yöne dash atacaðýz?
@@ -136,11 +126,8 @@ public class PlayerMovement : MonoBehaviour
         isDashing = false;
         rb.linearVelocity = Vector2.zero;
 
-        // 4. Bitiþ: Efektleri Kapat
-        if (trailRenderer != null) trailRenderer.emitting = false;
-
-        // 5. Bitiþ: Çarpýþmayý Geri Aç
-        if (enemyLayer != -1)
+        // 3. Bitiþ: Çarpýþmayý Geri Aç
+        if (enemyLayer != -1 && invincibleDuringDash)
             Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
     }
 }

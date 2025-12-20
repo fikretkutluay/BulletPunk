@@ -11,7 +11,7 @@ public class PlayerSkillController : MonoBehaviour
 
     [Header("Niþangah Ayarlarý")]
     [SerializeField] private Transform reticleTransform;
-    [SerializeField] private LayerMask groundLayer;
+    // groundLayer sildim çünkü kullanmýyorsun.
 
     [Header("Ultimate (R) Ayarlarý")]
     [Tooltip("Ultinin ne kadar uzaða vuracaðý")]
@@ -26,7 +26,10 @@ public class PlayerSkillController : MonoBehaviour
     private SkillData currentActiveSkill;
     private SkillData lastFiredSkill;
     private bool isAiming = false;
-    private Vector3 savedTargetPosition; // E skilli için hafýza
+    private Vector3 savedTargetPosition;
+
+    // Component Referanslarý (Performans için)
+    private SpriteRenderer spriteRenderer;
 
     // Cooldown Sayaçlarý
     private float cooldownQ_Timer = 0;
@@ -35,7 +38,9 @@ public class PlayerSkillController : MonoBehaviour
 
     private void Awake()
     {
+        // Componentleri bir kere bulup hafýzaya atýyoruz (Caching)
         if (animator == null) animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -44,7 +49,6 @@ public class PlayerSkillController : MonoBehaviour
 
         if (!isAiming)
         {
-            // Skill Seçimi
             if (Input.GetKeyDown(KeyCode.Q) && CheckSkillReady(skillQ, cooldownQ_Timer, ControlType.Skill1))
             {
                 StartAiming(skillQ);
@@ -55,22 +59,17 @@ public class PlayerSkillController : MonoBehaviour
             }
             else if (Input.GetKeyDown(KeyCode.R) && CheckSkillReady(skillR, cooldownR_Timer, ControlType.Skill3))
             {
-                // R için niþan almaya gerek yok, direkt çalýþtýrabiliriz ama
-                // senin yapýnda niþan moduyla tetiklendiði için buraya alýyorum.
                 StartAiming(skillR);
             }
         }
         else
         {
-            // Niþangah varsa güncelle (R için niþangah gizlenebilir, aþaðýda ayarladýk)
             UpdateReticlePosition();
 
-            // Sol Týk: Ateþle
             if (Input.GetMouseButtonDown(0))
             {
                 FireSkill();
             }
-            // Sað Týk: Ýptal
             else if (Input.GetMouseButtonDown(1))
             {
                 CancelAiming();
@@ -92,8 +91,6 @@ public class PlayerSkillController : MonoBehaviour
         currentActiveSkill = skill;
         isAiming = true;
 
-        // EÐER SKILL R ÝSE NÝÞANGAHI GÖSTERME (Ýsteðe baðlý)
-        // Çünkü karakterin önüne vuracak, mouse'a deðil.
         if (skill == skillR)
         {
             if (reticleTransform != null) reticleTransform.gameObject.SetActive(false);
@@ -106,7 +103,7 @@ public class PlayerSkillController : MonoBehaviour
 
     private void UpdateReticlePosition()
     {
-        if (currentActiveSkill == skillR) return; // R skilli mouse takip etmez
+        if (currentActiveSkill == skillR) return;
 
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0;
@@ -122,32 +119,32 @@ public class PlayerSkillController : MonoBehaviour
         }
     }
 
-    // --- 1. AÞAMA: ATEÞLEME (Animasyon Tetikleme) ---
+    // --- 1. AÞAMA: ATEÞLEME ---
     private void FireSkill()
     {
         if (currentActiveSkill == null) return;
         lastFiredSkill = currentActiveSkill;
 
-        // Hedef pozisyonu kaydet (E skilli için lazým)
+        // Hedef kaydetme
         if (reticleTransform != null && reticleTransform.gameObject.activeSelf)
             savedTargetPosition = reticleTransform.position;
         else
-            savedTargetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition); // R için mouse yönü alýnabilir veya karakter yönü
+            savedTargetPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        // Karakterin yönünü çevir (R skilli için mouse tarafýna dönmesi iyi olur)
+        // Karakteri Döndür (Artýk cache'lenen spriteRenderer'ý kullanýyoruz)
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         if (mouseWorldPos.x < transform.position.x)
-            GetComponent<SpriteRenderer>().flipX = true;
+            spriteRenderer.flipX = true;
         else
-            GetComponent<SpriteRenderer>().flipX = false;
+            spriteRenderer.flipX = false;
 
-        // Animasyonu Baþlat
+        // Animasyon
         if (!string.IsNullOrEmpty(currentActiveSkill.animTriggerName))
         {
             animator.SetTrigger(currentActiveSkill.animTriggerName);
         }
 
-        // Cooldown Baþlat
+        // Cooldown
         if (currentActiveSkill == skillQ) cooldownQ_Timer = skillQ.cooldown;
         else if (currentActiveSkill == skillE) cooldownE_Timer = skillE.cooldown;
         else if (currentActiveSkill == skillR) cooldownR_Timer = skillR.cooldown;
@@ -155,50 +152,41 @@ public class PlayerSkillController : MonoBehaviour
         CancelAiming();
     }
 
-    // --- 2. AÞAMA: ANÝMASYON EVENT ÝLE ÇAÐRILAN HASAR KODU ---
-    // Animation Event burayý tetikleyecek
+    // --- 2. AÞAMA: ANIMATION EVENT ---
     public void SpawnProjectileFromAnim()
     {
         if (lastFiredSkill == null) return;
 
-        // >>> SKILL R (ULTIMATE - HER ÞEYÝ YOK ET) <<<
+        // >>> SKILL R (ULTIMATE) <<<
         if (lastFiredSkill == skillR)
         {
-            Vector2 facingDir = GetComponent<SpriteRenderer>().flipX ? Vector2.left : Vector2.right;
+            // Cache'lenen renderer'ý kullanýyoruz
+            Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
 
-            // 1. Layer filtresi YOK. Yarýçaptaki HER Collider'ý alýyoruz.
             Collider2D[] allHits = Physics2D.OverlapCircleAll(transform.position, ultiRadius);
 
             foreach (Collider2D hit in allHits)
             {
-                // Kendimize vurmayalým
                 if (hit.gameObject == gameObject) continue;
 
-                // 2. Açý Kontrolü (Koni içinde mi?)
                 Vector2 dirToTarget = (hit.transform.position - transform.position).normalized;
 
                 if (Vector2.Angle(facingDir, dirToTarget) < ultiAngle / 2f)
                 {
-                    // 3. IDamageable ara (Hem objenin kendisine hem babasýna bak)
-                    // Bu sayede collider child'da olsa bile ana karakteri bulur.
                     IDamageable damageable = hit.GetComponentInParent<IDamageable>();
-
                     if (damageable != null)
                     {
-                        // Bulduðun an yapýþtýr hasarý
                         damageable.TakeDamage(lastFiredSkill.damage);
                     }
                 }
             }
         }
-
-        // >>> SKILL E (YILDIRIM - ALAN ETKÝLÝ) <<<
+        // >>> SKILL E (YILDIRIM) <<<
         else if (lastFiredSkill == skillE)
         {
             if (lastFiredSkill.projectilePrefab != null)
             {
                 GameObject lightningObj = Instantiate(lastFiredSkill.projectilePrefab, savedTargetPosition, Quaternion.identity);
-                // LightningSpell scriptini arýyoruz
                 LightningSpell spellScript = lightningObj.GetComponent<LightningSpell>();
                 if (spellScript != null)
                 {
@@ -206,8 +194,7 @@ public class PlayerSkillController : MonoBehaviour
                 }
             }
         }
-
-        // >>> SKILL Q (NORMAL MERMÝ) <<<
+        // >>> SKILL Q (MERMI) <<<
         else
         {
             Vector3 spawnPos = transform.position;
@@ -225,7 +212,7 @@ public class PlayerSkillController : MonoBehaviour
         }
     }
 
-    // Cooldown yönetimi
+    // Cooldown
     private void HandleCooldowns()
     {
         if (cooldownQ_Timer > 0) cooldownQ_Timer -= Time.deltaTime;
@@ -240,20 +227,20 @@ public class PlayerSkillController : MonoBehaviour
         if (reticleTransform != null) reticleTransform.gameObject.SetActive(false);
     }
 
-    // Editörde Ulti alanýný (Koniyi) görmek için
+    // Gizmos
     private void OnDrawGizmosSelected()
     {
-        // Ulti Alaný (Kýrmýzý)
         Gizmos.color = new Color(1, 0, 0, 0.3f);
-        Vector3 facingDir = GetComponent<SpriteRenderer>().flipX ? Vector3.left : Vector3.right;
 
-        // Koninin kenar çizgileri
+        // Editor modunda Awake çalýþmadýðý için burada GetComponent mecburidir
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        Vector3 facingDir = (sr != null && sr.flipX) ? Vector3.left : Vector3.right;
+
         Quaternion leftRot = Quaternion.AngleAxis(-ultiAngle / 2f, Vector3.forward);
         Quaternion rightRot = Quaternion.AngleAxis(ultiAngle / 2f, Vector3.forward);
         Gizmos.DrawRay(transform.position, (leftRot * facingDir) * ultiRadius);
         Gizmos.DrawRay(transform.position, (rightRot * facingDir) * ultiRadius);
 
-        // Menzil çemberi
         Gizmos.DrawWireSphere(transform.position, ultiRadius);
     }
 }
