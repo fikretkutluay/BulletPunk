@@ -2,28 +2,19 @@ using UnityEngine;
 
 public class ExperienceDrop : MonoBehaviour
 {
-    private Slider slider;
-    private Enemy enemyScript;
+    public int expAmount = 10;
+    public float attractSpeed = 5f; // For a "magnet" effect later if you want
 
-    public void Setup(Enemy enemy)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        enemyScript = enemy;
-        slider = GetComponentInChildren<Slider>();
-        
-        // Match slider max value to enemy max health
-        slider.maxValue = enemy.health;
-        slider.value = enemy.health;
-    }
-
-    void Update()
-    {
-        if (enemyScript != null)
+        // Check for the "PLAYER" tag as requested
+        if (collision.CompareTag("Player"))
         {
-            // Update the slider value to match the enemy's current health
-            slider.value = enemyScript.health;
-            
-            // Keep the health bar rotation static (doesn't flip if enemy flips)
-            transform.rotation = Quaternion.identity;
+            // Logic for adding EXP goes here 
+            // (e.g., PlayerLevel.Instance.AddExp(expAmount))
+            Debug.Log("Player picked up " + expAmount + " EXP!");
+
+            Destroy(gameObject);
         }
     }
 }

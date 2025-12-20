@@ -111,6 +111,7 @@ MonoBehaviour:
   flashMaterial: {fileID: 0}
   hitEffectPrefab: {fileID: 555528468544017161, guid: 1a1d34a3e41b50245b7699f9421f398c, type: 3}
   expPrefab: {fileID: 8550302515663834734, guid: 3d4b7541c395f1943acfbed0fe44ba6e, type: 3}
+  healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
 --- !u!61 &-4198603442879643353
 BoxCollider2D:
   m_ObjectHideFlags: 0

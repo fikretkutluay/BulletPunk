@@ -1,5 +1,6 @@
 using UnityEngine;
-using System.Collections; 
+using System.Collections;
+using UnityEngine.UI;
 public enum EnemyType { Fire, Electric, Toxic, Ice }
 
 public class Enemy : MonoBehaviour, IDamageable
@@ -8,59 +9,80 @@ public class Enemy : MonoBehaviour, IDamageable
     public EnemyType type;
     public float health = 50f;
     public float moveSpeed = 2f;
-    public float stoppingDistance = 5f; // <--- NEW: Arrange this in Inspector
+    public float stoppingDistance = 5f;
     public float shootInterval = 2f;
-    
+
     [Header("References")]
     public GameObject projectilePrefab;
     private Transform player;
     private float shootTimer;
-    
+
     [Header("Visual Effects")]
     public float flashDuration = 0.1f;
-    public Material flashMaterial;
+    private Material flashMaterial;
     private SpriteRenderer spriteRenderer;
-    private Color originalColor;
     public GameObject hitEffectPrefab;
-    
-    [Header("Drops")]
+
+    [Header("Drops & UI")]
     public GameObject expPrefab;
+    public GameObject healthBarPrefab;
+    private Slider healthSlider;
+
+    // Change this value to move the bar up or down
+    [SerializeField] private float healthBarOffsetY = 0.6f;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        // We access the material instance so we don't change ALL enemies at once
-        flashMaterial = spriteRenderer.material; 
+        // Using .material creates a unique instance for this enemy
+        flashMaterial = spriteRenderer.material;
     }
 
     private void Start()
     {
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p != null) player = p.transform;
+
+        SetupHealthBar();
+    }
+
+    void SetupHealthBar()
+    {
+        if (healthBarPrefab != null)
+        {
+            // We spawn it closer (0.6f instead of 1.5f)
+            GameObject hb = Instantiate(healthBarPrefab, transform.position + Vector3.up * healthBarOffsetY, Quaternion.identity, transform);
+            healthSlider = hb.GetComponentInChildren<Slider>();
+
+            if (healthSlider != null)
+            {
+                healthSlider.maxValue = health;
+                healthSlider.value = health;
+            }
+        }
     }
 
     private void Update()
     {
         if (player == null) return;
 
-        // Calculate distance to player
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        // 1. Follow Player (Only if further than stoppingDistance)
         if (distanceToPlayer > stoppingDistance)
         {
             Vector2 direction = (player.position - transform.position).normalized;
-            transform.Translate(direction * (moveSpeed * Time.deltaTime));
+            transform.Translate(direction * moveSpeed * Time.deltaTime);
         }
-        // Optional: If you want them to back away if the player gets too close, 
-        // you could add an 'else if (distanceToPlayer < stoppingDistance - 1f)' block here.
 
-        // 2. Shooting Logic (Stays the same)
         shootTimer += Time.deltaTime;
         if (shootTimer >= shootInterval)
         {
             Shoot();
             shootTimer = 0;
         }
+
+        // Keep UI from flipping if you decide to flip the sprite later
+        if (healthSlider != null) healthSlider.transform.parent.rotation = Quaternion.identity;
     }
 
     void Shoot()
@@ -70,68 +92,44 @@ public class Enemy : MonoBehaviour, IDamageable
         GameObject projGO = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
         EnemyProjectile proj = projGO.GetComponent<EnemyProjectile>();
 
-        Vector2 dir = player.position - transform.position;
+        Vector2 dir = (player.position - transform.position).normalized;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
         projGO.transform.rotation = Quaternion.Euler(0, 0, angle);
 
         switch (type)
         {
-            case EnemyType.Fire:     proj.targetKey = ControlType.Skill1; break; // Q
-            case EnemyType.Electric: proj.targetKey = ControlType.Skill2; break; // E
-            case EnemyType.Toxic:    proj.targetKey = ControlType.Skill1; break; // Q (as requested)
-            case EnemyType.Ice:      proj.targetKey = ControlType.Dash;   break; // Space
+            case EnemyType.Fire: proj.targetKey = ControlType.Skill1; break;
+            case EnemyType.Electric: proj.targetKey = ControlType.Skill2; break;
+            case EnemyType.Toxic: proj.targetKey = ControlType.Skill1; break;
+            case EnemyType.Ice: proj.targetKey = ControlType.Dash; break;
         }
     }
 
     public void TakeDamage(float amount)
     {
         health -= amount;
+        if (healthSlider != null) healthSlider.value = health;
+
         StartCoroutine(DamageFlashRoutine());
 
         if (hitEffectPrefab != null)
         {
             GameObject effect = Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
-            
-            // Color the particles based on type
-            ParticleSystem ps = effect.GetComponent<ParticleSystem>();
-            if(ps != null)
-            {
-                var main = ps.main;
-                switch(type) {
-                    case EnemyType.Fire: main.startColor = Color.red; break;
-                    case EnemyType.Ice: main.startColor = Color.cyan; break;
-                    case EnemyType.Toxic: main.startColor = Color.green; break;
-                    case EnemyType.Electric: main.startColor = Color.yellow; break;
-                }
-            }
+            // Optional: Color particles here as we did before
             Destroy(effect, 1f);
         }
 
-        if (health <= 0) 
+        if (health <= 0)
         {
-            SpawnExperience();
+            if (expPrefab != null) Instantiate(expPrefab, transform.position, Quaternion.identity);
             Destroy(gameObject);
-        }
-    }
-
-    void SpawnExperience()
-    {
-        if (expPrefab != null)
-        {
-            Instantiate(expPrefab, transform.position, Quaternion.identity);
         }
     }
 
     private IEnumerator DamageFlashRoutine()
     {
-        // 1. Turn the flash ON
-        // Note: "_FlashAmount" must match the variable name in your Shader
-        flashMaterial.SetFloat("_FlashAmount", 0.259f); 
-
-        // 2. Wait for a split second
+        flashMaterial.SetFloat("_FlashAmount", 0.259f);
         yield return new WaitForSeconds(flashDuration);
-
-        // 3. Turn the flash OFF
         flashMaterial.SetFloat("_FlashAmount", 0f);
     }
 }

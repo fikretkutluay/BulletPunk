@@ -112,6 +112,7 @@ MonoBehaviour:
   flashMaterial: {fileID: 0}
   hitEffectPrefab: {fileID: 555528468544017161, guid: 1a1d34a3e41b50245b7699f9421f398c, type: 3}
   expPrefab: {fileID: 7193711176243337692, guid: 67d71f38fe9598e48b1e40d254d8b25a, type: 3}
+  healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
 --- !u!61 &8031125311632892104
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -172,3 +173,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveDirection: {x: 0, y: 0, z: 0}
   speed: 5
+  frequency: 5
+  magnitude: 2
+  projectilePrefab: {fileID: 0}
+  shootInterval: 1.5
