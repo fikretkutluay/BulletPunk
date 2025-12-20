@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -6457936963552742667}
   - component: {fileID: 9149137904504409913}
   - component: {fileID: 5729964551392279381}
+  - component: {fileID: -3934088413397767170}
   m_Layer: 0
   m_Name: FireEnemy
   m_TagString: Untagged
@@ -31,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.1717, y: 2.063, z: 0}
-  m_LocalScale: {x: 1.3566, y: 1.06, z: 1.3566}
+  m_LocalScale: {x: 1.6252068, y: 1.2698799, z: 1.6252068}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -110,10 +111,10 @@ MonoBehaviour:
   shootInterval: 2
   projectilePrefab: {fileID: 6242481254165740418, guid: a9e1bc648631d1841aaf8dd381f48e37, type: 3}
   flashDuration: 0.1
-  flashMaterial: {fileID: 2100000, guid: 8f20cac784fc8be43adf4a5a239b3804, type: 2}
   hitEffectPrefab: {fileID: 555528468544017161, guid: 4772770c29cba0f4ebfca4a665ae3427, type: 3}
   expPrefab: {fileID: 755744620459229103, guid: 801910324488cd84399f986b4eab94d0, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
+  healthBarOffsetY: 0.6
 --- !u!95 &-6457936963552742667
 Animator:
   serializedVersion: 7
@@ -198,3 +199,30 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.09375, y: 1.21875}
   m_EdgeRadius: 0
+--- !u!50 &-3934088413397767170
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6467739222658468260}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4

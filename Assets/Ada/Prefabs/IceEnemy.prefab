@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1992193236806215077}
   - component: {fileID: 9180008027712098786}
   - component: {fileID: 8031125311632892104}
-  - component: {fileID: -519691230584416669}
+  - component: {fileID: 7893975987302508043}
   m_Layer: 0
   m_Name: IceEnemy
   m_TagString: Untagged
@@ -109,10 +109,10 @@ MonoBehaviour:
   shootInterval: 2
   projectilePrefab: {fileID: 6242481254165740418, guid: a9e1bc648631d1841aaf8dd381f48e37, type: 3}
   flashDuration: 0.1
-  flashMaterial: {fileID: 0}
   hitEffectPrefab: {fileID: 555528468544017161, guid: 1a1d34a3e41b50245b7699f9421f398c, type: 3}
   expPrefab: {fileID: 7193711176243337692, guid: 67d71f38fe9598e48b1e40d254d8b25a, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
+  healthBarOffsetY: 0.6
 --- !u!61 &8031125311632892104
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -159,21 +159,30 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.46875}
   m_EdgeRadius: 0
---- !u!114 &-519691230584416669
-MonoBehaviour:
+--- !u!50 &7893975987302508043
+Rigidbody2D:
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3673448942774312711}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 828a9cc995aafe1469d1878649ba1524, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveDirection: {x: 0, y: 0, z: 0}
-  speed: 5
-  frequency: 5
-  magnitude: 2
-  projectilePrefab: {fileID: 0}
-  shootInterval: 1.5
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
