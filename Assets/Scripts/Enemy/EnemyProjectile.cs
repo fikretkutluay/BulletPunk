@@ -7,6 +7,11 @@ public class EnemyProjectile : MonoBehaviour
     public float damage = 5f;
     public float speed = 5f;
 
+    [Header("Difficulty Settings")]
+    // This attribute creates a slider in the Inspector between 0.0 (0%) and 1.0 (100%)
+    [Range(0f, 1f)]
+    public float randomLockChance = 0.5f;
+
     void Update()
     {
         transform.Translate(Vector2.up * (speed * Time.deltaTime));
@@ -14,22 +19,26 @@ public class EnemyProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // Try to damage player
         IDamageable damageable = collision.GetComponent<IDamageable>();
+
         if (damageable != null)
         {
             damageable.TakeDamage(damage);
-            
-            // Apply the specific key lock
-            InputManager.Instance.ApplyLock(targetKey, lockDuration);
-            
-            // 50% chance to also disable a random WASD key
-            if (Random.value > 0.5f)
+
+            if (Random.value <= randomLockChance)
             {
-                ControlType randomWasd = (ControlType)Random.Range(0, 4); // MoveUp to MoveRight
-                InputManager.Instance.ApplyLock(randomWasd, lockDuration);
+                InputManager.Instance.ApplyLock(targetKey, lockDuration);
             }
-            
+
+            // 2. Chance-based lock for WASD
+            // Random.value returns a number between 0.0 and 1.0
+            if (Random.value <= randomLockChance)
+            {
+                ControlType randomWasd = (ControlType)Random.Range(0, 4);
+                InputManager.Instance.ApplyLock(randomWasd, lockDuration);
+                Debug.Log("Random WASD Lock Triggered!");
+            }
+
             Destroy(gameObject);
         }
     }

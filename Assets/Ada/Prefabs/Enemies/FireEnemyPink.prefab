@@ -32,7 +32,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.1717, y: 2.063, z: 0}
-  m_LocalScale: {x: 1.6252068, y: 1.2698799, z: 1.6252068}
+  m_LocalScale: {x: 3.463966, y: 2.7066221, z: 3.463966}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -108,11 +108,11 @@ MonoBehaviour:
   health: 50
   moveSpeed: 2
   stoppingDistance: 5
-  shootInterval: 2
-  projectilePrefab: {fileID: 6242481254165740418, guid: a9e1bc648631d1841aaf8dd381f48e37, type: 3}
+  shootInterval: 0.1
+  projectilePrefab: {fileID: 3580863725872959338, guid: 979096c2f5cb89d4daedd15cf9ba0a7a, type: 3}
   flashDuration: 0.1
   hitEffectPrefab: {fileID: 555528468544017161, guid: 4772770c29cba0f4ebfca4a665ae3427, type: 3}
-  expPrefab: {fileID: 755744620459229103, guid: 801910324488cd84399f986b4eab94d0, type: 3}
+  expPrefab: {fileID: 2266597332171287316, guid: ae835597f48dbf349a5db73febaf4d52, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
   healthBarOffsetY: 0.6
 --- !u!95 &-6457936963552742667

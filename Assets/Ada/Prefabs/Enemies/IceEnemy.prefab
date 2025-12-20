@@ -110,7 +110,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 6242481254165740418, guid: a9e1bc648631d1841aaf8dd381f48e37, type: 3}
   flashDuration: 0.1
   hitEffectPrefab: {fileID: 555528468544017161, guid: 1a1d34a3e41b50245b7699f9421f398c, type: 3}
-  expPrefab: {fileID: 7193711176243337692, guid: 67d71f38fe9598e48b1e40d254d8b25a, type: 3}
+  expPrefab: {fileID: 130401510781278458, guid: 7b37200b75a16e841b7dd80a70884963, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
   healthBarOffsetY: 0.6
 --- !u!61 &8031125311632892104

@@ -10,3 +10,13 @@ public enum ControlType
     Skill3,    // R
     Dash       // Space
 }
+
+[System.Serializable]
+public class UpgradeOption
+{
+    public string upgradeName;
+    public string description;
+    public UpgradeType type;
+}
+
+public enum UpgradeType { Q_Damage, E_Damage, R_Damage, Health_Max }

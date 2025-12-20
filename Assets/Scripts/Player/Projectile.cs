@@ -43,9 +43,11 @@ public class Projectile : MonoBehaviour
             // Kendini yok et (Patlama efekti eklenebilir)
             Destroy(gameObject);
         }
-        else if (other.CompareTag("Wall") || other.CompareTag("Obstacle")) // Duvara çarparsa
+        /*else if (other.CompareTag("Wall") || other.CompareTag("Obstacle")) // Duvara çarparsa
         {
+
             Destroy(gameObject);
-        }
+        }*/
+        
     }
 }

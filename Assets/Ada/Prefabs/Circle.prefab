@@ -106,6 +106,7 @@ MonoBehaviour:
   lockDuration: 2
   damage: 5
   speed: 5
+  randomLockChance: 0.15
 --- !u!50 &4143798020589125273
 Rigidbody2D:
   serializedVersion: 5

@@ -1,9 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI; // UI kullanacaðýz
-using TMPro;
 
+using TMPro;
 public class PlayerStats : MonoBehaviour, IDamageable
 {
+    [Header("Skill Bonuses")]
+    public float qDamageMultiplier = 1f;
+    public float eDamageMultiplier = 1f;
+    public float rDamageMultiplier = 1f;
+
     [Header("Can Ayarlarý")]
     public float maxHealth = 100f;
     public float currentHealth;
@@ -16,7 +21,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [Header("UI Referanslarý")]
     public Slider healthSlider;
     public Slider xpSlider;
-    public TextMeshPro levelText; // Level 1, Level 2 yazýsý için (Opsiyonel)
+    public TextMeshProUGUI levelText; // Level 1, Level 2 yazýsý için (Opsiyonel)
 
     private void Start()
     {
@@ -27,6 +32,14 @@ public class PlayerStats : MonoBehaviour, IDamageable
     // IDamageable'dan gelen hasar alma fonksiyonu
     public void TakeDamage(float amount)
     {
+        // Check if the player is currently dashing and invincible
+        PlayerMovement movement = GetComponent<PlayerMovement>();
+        if (movement != null && movement.IsInvincible)
+        {
+            Debug.Log("Dash used! Damage avoided.");
+            return; // Exit the function without taking damage
+        }
+
         currentHealth -= amount;
         if (currentHealth < 0) currentHealth = 0;
 
@@ -49,24 +62,34 @@ public class PlayerStats : MonoBehaviour, IDamageable
     {
         currentXP += amount;
 
-        // Level Atlama Kontrolü
-        if (currentXP >= xpToNextLevel)
+        // Use a 'while' loop instead of 'if' in case the boss gives 
+        // enough XP for 2 or 3 levels at once!
+        while (currentXP >= xpToNextLevel)
         {
             LevelUp();
         }
         UpdateUI();
     }
-
     private void LevelUp()
     {
         currentXP -= xpToNextLevel;
         currentLevel++;
-        xpToNextLevel *= 1.2f; // Her levelde zorlaþsýn
+        xpToNextLevel *= 1.2f;
 
-        // Level atlayýnca caný fulleyelim (Ödül)
-        Heal(maxHealth);
+        // Call the Level Up Menu
+        if (LevelUpManager.Instance != null)
+        {
+            LevelUpManager.Instance.ShowLevelUpMenu();
+        }
 
-        Debug.Log("LEVEL UP! Yeni Level: " + currentLevel);
+        currentHealth = maxHealth;
+        UpdateUI();
+
+        if (LevelUpManager.Instance != null)
+        {
+            LevelUpManager.Instance.ShowLevelUpMenu();
+        }
+
     }
 
     private void UpdateUI()

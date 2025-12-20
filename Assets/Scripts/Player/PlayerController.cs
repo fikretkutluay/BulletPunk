@@ -20,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     private float dashTimer = 0f;
     private int playerLayer;
     private int enemyLayer;
+  public bool IsInvincible => isDashing && invincibleDuringDash;
 
     [Header("Görsel Ayarlar")]
     [SerializeField] private Animator animator;
