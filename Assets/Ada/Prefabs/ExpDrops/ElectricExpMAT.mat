@@ -24,7 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 19fb86013d8c24d6cb8410c0aadf30fa, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0342d8d35282ed24788731f201479680, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture2D:
@@ -45,9 +45,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _FlashAmount: 0.45
+    - _FlashAmount: 0.5
     m_Colors:
-    - _FlashColor: {r: 62.387894, g: 52.720924, b: 0, a: 1}
+    - _FlashColor: {r: 0.42326775, g: 0.39157256, b: 0.020288562, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &8871596325183022951
