@@ -162,18 +162,22 @@ public class CyberDragon : MonoBehaviour, IDamageable
 
     void SetNewTargetPoint()
     {
-        // 1. Pick a random direction (Vector2 with length of 1)
-        // .normalized ensures the point is ON the circle, not INSIDE it
-        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        if (player == null) return;
 
-        // 2. Multiply by the radius to get the exact border point
-        Vector3 offset = (Vector3)(randomDirection * pointRadius);
+        // 1. Get the direction from the Player to the Dragon
+        Vector2 dirFromPlayer = (transform.position - player.position).normalized;
 
-        // 3. Set the target relative to the player
-        currentTargetPoint = player.position + offset;
+        // 2. Flip it to get the "Opposite Side" base direction
+        Vector2 oppositeDir = -dirFromPlayer;
 
-        // Optional: Log for debug
-        // Debug.Log("New Border Target Set: " + currentTargetPoint);
+        // 3. Add a random spread (e.g., within 45 degrees of the opposite point)
+        // This prevents the dragon from just moving in a perfect boring line
+        float randomAngle = Random.Range(-45f, 45f);
+        Quaternion spreadRotation = Quaternion.Euler(0, 0, randomAngle);
+        Vector2 finalDir = spreadRotation * oppositeDir;
+
+        // 4. Set the point on the border
+        currentTargetPoint = player.position + (Vector3)(finalDir.normalized * pointRadius);
     }
 
     void MoveBody()
