@@ -5,6 +5,8 @@ public class MainMenuManager : MonoBehaviour
 {
     public GameObject creditsPanel;
     public GameObject mainMenu;
+    public GameObject settingsPanel;
+    public GameObject tutorialPanel;
     // Oyna Butonu buna baðlanacak
     public void PlayGame()
     {
@@ -18,7 +20,7 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("Oyundan Çýkýldý!"); // Editörde kapanmaz, log düþer
         Application.Quit();
     }
-   
+
     public void CreditsPanel()
     {
         creditsPanel.SetActive(true);
@@ -27,7 +29,19 @@ public class MainMenuManager : MonoBehaviour
     public void MainMenu()
     {
         creditsPanel.SetActive(false);
+        tutorialPanel.SetActive(false);
+        settingsPanel.SetActive(false);
         mainMenu.SetActive(true);
+    }
+
+    public void SettingsPanel()
+    {
+        settingsPanel.SetActive(true);
+    }
+
+    public void TutorialPanel()
+    {
+        tutorialPanel.SetActive(true);
     }
 
 
