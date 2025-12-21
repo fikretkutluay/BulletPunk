@@ -128,7 +128,7 @@ MonoBehaviour:
   knockbackForce: 5
   knockbackDuration: 0.2
   healthPrefab: {fileID: 964545961750516144, guid: 1dbdf00462710dd418ce4f3aa5ddacc2, type: 3}
-  healthDropChance: 0.1
+  healthDropChance: 2.7
 --- !u!95 &-6457936963552742667
 Animator:
   serializedVersion: 7

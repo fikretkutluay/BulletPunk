@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
     private Vector2 movementInput;
+    public Texture2D defaultCursor;
+    public Vector2 hotSpot = Vector2.zero;
 
     void Awake()
     {
@@ -53,7 +55,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         // Hides the cursor completely
-        Cursor.visible = false;
+        Cursor.SetCursor(defaultCursor, hotSpot, CursorMode.Auto);
     }
 
     // Güvenlik: Obje kapanýrsa çarpýþmayý düzelt

@@ -122,7 +122,7 @@ MonoBehaviour:
   knockbackForce: 5
   knockbackDuration: 0.2
   healthPrefab: {fileID: 964545961750516144, guid: 1dbdf00462710dd418ce4f3aa5ddacc2, type: 3}
-  healthDropChance: 100
+  healthDropChance: 2.7
 --- !u!61 &8471266296719710227
 BoxCollider2D:
   m_ObjectHideFlags: 0

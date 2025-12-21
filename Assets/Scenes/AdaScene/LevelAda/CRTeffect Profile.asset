@@ -18,10 +18,10 @@ MonoBehaviour:
     m_Value: 1
   threshold:
     m_OverrideState: 1
-    m_Value: 0.9
+    m_Value: 1.5
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 10
   scatter:
     m_OverrideState: 0
     m_Value: 0.7
@@ -80,7 +80,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.097
 --- !u!114 &4539455006686422828
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -105,7 +105,7 @@ MonoBehaviour:
     m_Value: 0.303
   smoothness:
     m_OverrideState: 1
-    m_Value: 0.65
+    m_Value: 0.579
   rounded:
     m_OverrideState: 0
     m_Value: 0
@@ -124,10 +124,10 @@ MonoBehaviour:
   active: 1
   distance:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0.221
   cropToFit:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 0
 --- !u!114 &9105682777793362389
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -146,7 +146,7 @@ MonoBehaviour:
     m_Value: 10
   intensity:
     m_OverrideState: 1
-    m_Value: 0.08
+    m_Value: 0.075
   response:
     m_OverrideState: 1
     m_Value: 1
