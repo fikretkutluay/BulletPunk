@@ -102,7 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e2ff09f9d9729e4d9fd9596c654d05e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expAmount: 10
+  expAmount: 50
 --- !u!61 &5321735319294525601
 BoxCollider2D:
   m_ObjectHideFlags: 0

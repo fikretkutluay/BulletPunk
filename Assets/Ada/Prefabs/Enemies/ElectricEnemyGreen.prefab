@@ -110,7 +110,7 @@ MonoBehaviour:
   isShotgun: 0
   shotgunPelletCount: 3
   shotgunSpreadAngle: 15
-  projectilePrefab: {fileID: 3580863725872959338, guid: 979096c2f5cb89d4daedd15cf9ba0a7a, type: 3}
+  projectilePrefab: {fileID: 1218916750921686244, guid: 8e28a7da58979594eb7c24cebf130b6a, type: 3}
   flashDuration: 0.2
   hitEffectRadius: 0.6
   hitEffectPrefabs:

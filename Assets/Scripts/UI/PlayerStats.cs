@@ -2,20 +2,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerStats : MonoBehaviour, IDamageable
 {
+    // ... [Existing Skill and Audio Headers remain the same] ...
     [Header("Skill Bonuses")]
     public float qDamageMultiplier = 1f;
     public float eDamageMultiplier = 1f;
     public float rDamageMultiplier = 1f;
-    [Header("Ses Efektleri")] // --- 1. DEÐÝÞKENLERÝ EKLE ---
-    public AudioClip xpSound; // XP sesi buraya
-    private AudioSource audioSource; // Hoparlör
+
+    [Header("Ses Efektleri")]
+    public AudioClip xpSound;
+    private AudioSource audioSource;
+
     [Header("Can Ayarlarý")]
     public float maxHealth = 100f;
     public float currentHealth;
-    public float healthIncreaseMult =1.5f;
+    public float healthIncreaseMult = 1.5f;
 
     [Header("XP Ayarlarý")]
     public float currentXP = 0f;
@@ -27,7 +31,20 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public Slider xpSlider;
     public TextMeshProUGUI levelText;
 
-    // --- ÖLÜM SÝSTEMÝ ---
+    [Header("Hit Effects")]
+    public List<GameObject> hitEffectPrefabs;
+    public float hitEffectRadius = 0.3f;
+    public float hitCooldown = 0.2f;
+    private float lastHitTime;
+
+    [Header("Visual Feedback")]
+    public SpriteRenderer playerSprite;
+    public float flashDuration = 0.1f;
+    private Material flashMaterial;
+
+   
+    
+
     private Animator animator;
     private GameMenuManager menuManager;
     private bool isDead = false;
@@ -36,25 +53,38 @@ public class PlayerStats : MonoBehaviour, IDamageable
     {
         currentHealth = maxHealth;
         animator = GetComponent<Animator>();
-        // Unity 6 için FindFirstObjectByType
         menuManager = FindFirstObjectByType<GameMenuManager>();
         audioSource = GetComponent<AudioSource>();
 
+        
+
         UpdateUI();
+        if (playerSprite != null)
+        {
+            // Use .material to create a unique instance for the player
+            flashMaterial = playerSprite.material;
+        }
     }
 
     public void TakeDamage(float amount)
     {
         if (isDead) return;
 
+        // --- NEW: HIT COOLDOWN & EFFECTS ---
+        if (Time.time < lastHitTime + hitCooldown) return;
+        lastHitTime = Time.time;
+
         PlayerMovement movement = GetComponent<PlayerMovement>();
-        if (movement != null && movement.IsInvincible)
-        {
-            return;
-        }
+        if (movement != null && movement.IsInvincible) return;
 
         currentHealth -= amount;
         if (currentHealth < 0) currentHealth = 0;
+
+        // --- SPAWN RANDOM HIT EFFECT ---
+        SpawnHitEffect();
+
+        // --- VISUAL FLASH ---
+        if (playerSprite != null) StartCoroutine(DamageFlashRoutine());
 
         UpdateUI();
 
@@ -63,6 +93,39 @@ public class PlayerStats : MonoBehaviour, IDamageable
             Die();
         }
     }
+
+    private void SpawnHitEffect()
+    {
+        if (hitEffectPrefabs != null && hitEffectPrefabs.Count > 0)
+        {
+            // Pick random prefab
+            int randomIndex = Random.Range(0, hitEffectPrefabs.Count);
+
+            // Calculate random offset
+            Vector2 randomOffset = Random.insideUnitCircle * hitEffectRadius;
+            Vector3 spawnPos = transform.position + (Vector3)randomOffset + new Vector3(0, 0, -1f);
+
+            // Spawn
+            GameObject effect = Instantiate(hitEffectPrefabs[randomIndex], spawnPos, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+            Destroy(effect, 0.5f); // Cleanup
+        }
+    }
+
+    private IEnumerator DamageFlashRoutine()
+    {
+        if (flashMaterial != null)
+        {
+            // Set the shader property (ensure name matches your shader)
+            flashMaterial.SetFloat("_FlashAmount", 0.941f);
+
+            yield return new WaitForSeconds(flashDuration);
+
+            // Reset to normal
+            flashMaterial.SetFloat("_FlashAmount", 0f);
+        }
+    }
+
+    // ... [Heal, GainXP, LevelUp, and UpdateUI remain the same] ...
 
     public void Heal(float amount)
     {
@@ -76,11 +139,8 @@ public class PlayerStats : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
-        // --- 3. SESÝ ÇAL ---
-        // Her XP geldiðinde çalmasý için buraya ekliyoruz
         if (audioSource != null && xpSound != null)
         {
-            // Sesi biraz kýsýk çalalým (0.5f), çok sýk tekrar edebilir
             audioSource.PlayOneShot(xpSound, 0.5f);
         }
 
@@ -123,7 +183,6 @@ public class PlayerStats : MonoBehaviour, IDamageable
     {
         Debug.Log("OYUNCU ÖLDÜ - HERKES DURSUN!");
 
-        // 1. OYUNCUYU KÝLÝTLE
         if (GetComponent<PlayerMovement>()) GetComponent<PlayerMovement>().enabled = false;
         if (GetComponent<PlayerSkillController>()) GetComponent<PlayerSkillController>().enabled = false;
 
@@ -136,32 +195,22 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         if (GetComponent<Collider2D>()) GetComponent<Collider2D>().enabled = false;
 
-        // 2. TÜM DÜÞMANLARI BUL VE DONDUR (YENÝ KISIM)
-        // Sahnedeki tüm "Enemy" scriptlerini buluyoruz
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
         foreach (Enemy enemy in enemies)
         {
-            // Düþmanýn beynini (Update) kapat
             enemy.enabled = false;
-
-            // Varsa animasyonunu dondur
             if (enemy.GetComponent<Animator>()) enemy.GetComponent<Animator>().enabled = false;
-
-            // Fiziksel olarak kaymasýný engelle
             if (enemy.GetComponent<Rigidbody2D>()) enemy.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
         }
 
-        // 3. ANÝMASYONU OYNAT
         if (animator != null)
         {
             animator.SetTrigger("Die");
         }
 
-        // 4. BEKLEME (1.5 saniye - Animasyon bitene kadar)
         yield return new WaitForSeconds(3f);
 
-        // 5. GAME OVER PANELÝ
         if (menuManager != null)
         {
             menuManager.ShowGameOver();

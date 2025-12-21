@@ -118,7 +118,7 @@ MonoBehaviour:
   - {fileID: 7273307749629735230, guid: 2af8d76804531e840b9a026b98dc5d3d, type: 3}
   - {fileID: 1992454573130426520, guid: 5f04f5565506e8949993149e434d072c, type: 3}
   - {fileID: 5232402537905560773, guid: 06407dfa85870414381c7f5e1c1de020, type: 3}
-  expPrefab: {fileID: 130401510781278458, guid: 7b37200b75a16e841b7dd80a70884963, type: 3}
+  expPrefab: {fileID: 4721015224064186507, guid: 18ca67dbc24fe0840bf9f1b22736ccdc, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
   healthBarOffsetY: 0.6
   knockbackForce: 5

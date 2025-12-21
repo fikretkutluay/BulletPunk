@@ -21,6 +21,13 @@ public class Enemy : MonoBehaviour, IDamageable
     public int shotgunPelletCount = 3;
     public float shotgunSpreadAngle = 15f;
 
+    [Header("Difficulty Scaling")]
+    public float baseDamage = 10f;             // The starting damage
+    public float damageIncreaseInterval = 60f; // How often it doubles (60s)
+
+    private static float currentDamageMultiplier = 1f; // Shared by ALL enemies
+    private static float globalTimer = 0f;             // Shared timer
+
     [Header("References")]
     public GameObject projectilePrefab;
     private Transform player;
@@ -55,6 +62,10 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Start()
     {
+        // RESET Scaling when the scene starts/restarts
+        currentDamageMultiplier = 1f;
+        globalTimer = 0f;
+
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p != null) player = p.transform;
 
@@ -96,6 +107,15 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Update()
     {
         if (player == null) return;
+
+        // --- HANDLE GLOBAL DAMAGE SCALING ---
+        globalTimer += Time.deltaTime;
+        if (globalTimer >= damageIncreaseInterval)
+        {
+            currentDamageMultiplier *= 2f; // Doubling the damage
+            globalTimer = 0f;              // Reset the timer
+            Debug.Log("Difficulty Increased! New Multiplier: x" + currentDamageMultiplier);
+        }
 
         HandleSpriteFlip();
 
@@ -154,6 +174,7 @@ public class Enemy : MonoBehaviour, IDamageable
 
         if (proj != null)
         {
+            proj.damage = baseDamage * currentDamageMultiplier;
             switch (type)
             {
                 case EnemyType.Fire: proj.targetKey = ControlType.Skill1; break;
