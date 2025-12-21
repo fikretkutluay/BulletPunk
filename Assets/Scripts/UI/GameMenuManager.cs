@@ -3,26 +3,39 @@ using UnityEngine.SceneManagement;
 
 public class GameMenuManager : MonoBehaviour
 {
+    // Singleton: Diðer scriptlerden (PlayerStats) ulaþmak için þart
+    public static GameMenuManager Instance;
+
     [Header("Paneller")]
     public GameObject pauseMenuPanel;
     public GameObject gameOverPanel;
 
     // Oyun durdu mu kontrolü
     public static bool isGamePaused = false;
-
-    // Geçici test tuþu (K) için deðiþken
     private bool isGameOver = false;
+
+    private void Awake()
+    {
+        // Singleton Kurulumu
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Update()
     {
-        // GEÇÝCÝ: K tuþuna basýnca ÖLME TESTÝ
-        // Arkadaþýn PlayerStats'ý bitirince burayý silersin.
+        // GEÇÝCÝ: K tuþu ile test (Ýþin bitince silersin)
         if (Input.GetKeyDown(KeyCode.K) && !isGameOver)
         {
             ShowGameOver();
         }
 
-        // Eðer oyun bitmediyse ESC ile durdur/devam ettir
+        // ESC Tuþu Kontrolü
         if (Input.GetKeyDown(KeyCode.Escape) && !isGameOver)
         {
             if (isGamePaused)
@@ -49,25 +62,29 @@ public class GameMenuManager : MonoBehaviour
     public void LoadMainMenu()
     {
         Time.timeScale = 1f; // Menüye dönerken zamaný düzelt!
+        isGamePaused = false;
         SceneManager.LoadScene(0);
     }
 
-    // --- RESTART SORUNUNU ÇÖZEN KISIM ---
     public void RestartGame()
     {
-        // KRÝTÝK: Sahne yüklenmeden önce zamaný normale döndürmelisin.
-        // Yoksa oyun "Pause" modunda baþlar.
         Debug.Log("RESTART BUTONUNA BASILDI! SAHNE YÜKLENÝYOR...");
 
-        Time.timeScale = 1f;
+        Time.timeScale = 1f; // Önce zamaný düzelt
+        isGamePaused = false;
 
-        SceneManager.LoadScene(1);
+        // Mevcut sahneyi yeniden yükle
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void ShowGameOver()
     {
         isGameOver = true;
         gameOverPanel.SetActive(true);
+
+        // Eðer Pause paneli açýksa onu kapat ki üst üste binmesin
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+
         Time.timeScale = 0f; // Oyunu dondur
     }
 }
