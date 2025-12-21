@@ -110,6 +110,8 @@ MonoBehaviour:
   isShotgun: 0
   shotgunPelletCount: 3
   shotgunSpreadAngle: 15
+  baseDamage: 10
+  damageIncreaseInterval: 60
   projectilePrefab: {fileID: 1218916750921686244, guid: 8e28a7da58979594eb7c24cebf130b6a, type: 3}
   flashDuration: 0.2
   hitEffectRadius: 0.6
@@ -123,6 +125,8 @@ MonoBehaviour:
   healthBarOffsetY: 1
   knockbackForce: 5
   knockbackDuration: 0.2
+  healthPrefab: {fileID: 964545961750516144, guid: 1dbdf00462710dd418ce4f3aa5ddacc2, type: 3}
+  healthDropChance: 0.1
 --- !u!61 &-7511194371169471048
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -153,7 +157,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

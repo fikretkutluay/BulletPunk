@@ -14,6 +14,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     [Header("Ses Efektleri")]
     public AudioClip xpSound;
+    public AudioClip healthSound;
     private AudioSource audioSource;
 
     [Header("Can Ayarlarý")]
@@ -130,6 +131,10 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public void Heal(float amount)
     {
         if (isDead) return;
+        if (audioSource != null && healthSound != null)
+        {
+            audioSource.PlayOneShot(healthSound, 0.5f);
+        }
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         UpdateUI();
@@ -158,11 +163,21 @@ public class PlayerStats : MonoBehaviour, IDamageable
         currentLevel++;
         xpToNextLevel *= 1.2f;
 
+        // --- INCREASE MOVE SPEED ---
+        PlayerMovement movement = GetComponent<PlayerMovement>();
+        if (movement != null)
+        {
+            movement.IncreaseMoveSpeed(2f); // We will create this function next
+        }
+
         if (LevelUpManager.Instance != null)
             LevelUpManager.Instance.ShowLevelUpMenu();
+
         maxHealth *= healthIncreaseMult;
         currentHealth = maxHealth;
         UpdateUI();
+
+        Debug.Log("Leveled Up! New Move Speed: " + (movement != null ? movement.GetCurrentSpeed().ToString() : "N/A"));
     }
 
     private void UpdateUI()

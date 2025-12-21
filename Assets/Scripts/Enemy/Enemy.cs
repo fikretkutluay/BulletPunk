@@ -52,6 +52,11 @@ public class Enemy : MonoBehaviour, IDamageable
     private bool isKnockedBack = false;
     private Rigidbody2D rb;
 
+    [Header("Drops & UI")]
+    public GameObject healthPrefab; // Drag your Health Pickup prefab here
+    [Range(0, 100)]
+    public float healthDropChance = 20f;
+
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -234,7 +239,16 @@ public class Enemy : MonoBehaviour, IDamageable
         // 5. Death Logic
         if (health <= 0)
         {
+            // 1. Drop Experience (Existing logic)
             if (expPrefab != null) Instantiate(expPrefab, transform.position, Quaternion.identity);
+
+            // 2. Drop Health based on chance
+            float randomRoll = Random.Range(0f, 100f);
+            if (randomRoll <= healthDropChance && healthPrefab != null)
+            {
+                Instantiate(healthPrefab, transform.position, Quaternion.identity);
+            }
+
             Destroy(gameObject);
         }
     }
