@@ -1,41 +1,76 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // Mouse olaylarýný yakalamak için þart
+using UnityEngine.EventSystems;
+using UnityEngine.UI; // Butonun aktifliðini kontrol etmek için
 
-public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+// Bu satýr sayesinde scripti attýðýn objeye otomatik AudioSource eklenir
+[RequireComponent(typeof(AudioSource))]
+public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    [Header("Ayarlar")]
-    public float hoverScale = 1.1f; // Ne kadar büyüsün? (1.2 = %20 büyür)
-    public float speed = 8f;       // Büyüme hýzý (Hollow Knight gibi yumuþak olmasý için)
+    [Header("Görsel Ayarlar")]
+    public float hoverScale = 1.1f;
+    public float speed = 8f;
+
+    [Header("Ses Ayarlarý")]
+    public AudioClip hoverSound; // Üzerine gelme sesi (Bip)
+    public AudioClip clickSound; // Týklama sesi (Çýt)
+    [Range(0f, 1f)] public float soundVolume = 0.5f; // Ses þiddeti
 
     private Vector3 originalScale;
     private Vector3 targetScale;
+    private AudioSource audioSource;
+    private Button button;
 
     void Start()
     {
-        // Baþlangýçtaki boyutunu kaydet (Genelde 1,1,1)
         originalScale = transform.localScale;
         targetScale = originalScale;
+
+        // Bileþenleri alýyoruz
+        audioSource = GetComponent<AudioSource>();
+        button = GetComponent<Button>();
+
+        // AudioSource ayarlarýný kodla yapalým (Uðraþma diye)
+        audioSource.playOnAwake = false;
+        audioSource.loop = false;
+        audioSource.spatialBlend = 0; // 2D ses olsun
     }
 
     void Update()
     {
-        // Lerp fonksiyonu ile "yumuþak" geçiþ yap
-        // Aniden büyümek yerine yavaþça hedef boyuta kayar
+        // Time.unscaledDeltaTime kullanman harika, pause menüsünde de çalýþýr
         transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.unscaledDeltaTime * speed);
     }
 
-    // Mouse üzerine gelince çalýþýr
+    // --- MOUSE ÜZERÝNE GELÝNCE ---
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // Eðer buton "Interactable" deðilse (sönükse) tepki verme
+        if (button != null && !button.interactable) return;
+
         targetScale = originalScale * hoverScale;
 
-        // Ýstersen burada "Hover Sesi" de çaldýrabilirsin
-        // AudioSource.PlayOneShot(hoverSound);
+        // Hover Sesi Çal
+        if (hoverSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(hoverSound, soundVolume);
+        }
     }
 
-    // Mouse üzerinden çekilince çalýþýr
+    // --- MOUSE ÜZERÝNDEN GÝDÝNCE ---
     public void OnPointerExit(PointerEventData eventData)
     {
         targetScale = originalScale;
+    }
+
+    // --- TIKLAYINCA (YENÝ EKLENDÝ) ---
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (button != null && !button.interactable) return;
+
+        // Click Sesi Çal
+        if (clickSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clickSound, soundVolume);
+        }
     }
 }

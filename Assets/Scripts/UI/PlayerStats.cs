@@ -9,7 +9,9 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public float qDamageMultiplier = 1f;
     public float eDamageMultiplier = 1f;
     public float rDamageMultiplier = 1f;
-
+    [Header("Ses Efektleri")] // --- 1. DEÐÝÞKENLERÝ EKLE ---
+    public AudioClip xpSound; // XP sesi buraya
+    private AudioSource audioSource; // Hoparlör
     [Header("Can Ayarlarý")]
     public float maxHealth = 100f;
     public float currentHealth;
@@ -35,6 +37,8 @@ public class PlayerStats : MonoBehaviour, IDamageable
         animator = GetComponent<Animator>();
         // Unity 6 için FindFirstObjectByType
         menuManager = FindFirstObjectByType<GameMenuManager>();
+        audioSource = GetComponent<AudioSource>();
+
         UpdateUI();
     }
 
@@ -70,6 +74,15 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public void GainXP(float amount)
     {
         if (isDead) return;
+
+        // --- 3. SESÝ ÇAL ---
+        // Her XP geldiðinde çalmasý için buraya ekliyoruz
+        if (audioSource != null && xpSound != null)
+        {
+            // Sesi biraz kýsýk çalalým (0.5f), çok sýk tekrar edebilir
+            audioSource.PlayOneShot(xpSound, 0.5f);
+        }
+
         currentXP += amount;
         while (currentXP >= xpToNextLevel)
         {

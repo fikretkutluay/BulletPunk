@@ -15,12 +15,18 @@ public class PlayerMovement : MonoBehaviour
     [Header("Katman Ayarlarý")]
     [SerializeField] private string enemyLayerName = "Enemy"; // Çarpýþmayý kapatacaðýmýz katman adý
 
+    [Header("Ses Efektleri")] // --- YENÝ EKLENEN KISIM ---
+    [SerializeField] private AudioClip dashSound; // Dash ses dosyasý
+    [Range(0f, 1f)]
+    [SerializeField] private float dashVolume = 0.6f; // Ses seviyesi
+    private AudioSource audioSource; // Hoparlör
+
     // Dash Durum Deðiþkenleri
     private bool isDashing = false;
     private float dashTimer = 0f;
     private int playerLayer;
     private int enemyLayer;
-  public bool IsInvincible => isDashing && invincibleDuringDash;
+    public bool IsInvincible => isDashing && invincibleDuringDash;
 
     [Header("Görsel Ayarlar")]
     [SerializeField] private Animator animator;
@@ -32,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        // Ses bileþenini alýyoruz --- YENÝ ---
+        audioSource = GetComponent<AudioSource>();
 
         if (animator == null) animator = GetComponent<Animator>();
 
@@ -57,6 +66,12 @@ public class PlayerMovement : MonoBehaviour
         // --- DASH GÝRÝÞÝ ---
         if (Input.GetKeyDown(KeyCode.Space) && dashTimer <= 0 && InputManager.Instance.IsControlActive(ControlType.Dash))
         {
+            // --- YENÝ: SES ÇALMA ---
+            if (audioSource != null && dashSound != null)
+            {
+                audioSource.PlayOneShot(dashSound, dashVolume);
+            }
+
             StartCoroutine(PerformDash());
         }
 

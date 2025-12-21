@@ -9,6 +9,12 @@ public class PlayerSkillController : MonoBehaviour
     [SerializeField] private SkillData skillR; // Ultimate (Yarým Daire Yok Etme)
     [SerializeField] private Animator animator;
 
+    [Header("Ses Efektleri")]
+    public AudioClip soundQ; // Q sesi
+    public AudioClip soundE; // E sesi
+    public AudioClip soundR; // R sesi
+    private AudioSource audioSource; // Hoparlörümüz
+
     [Header("Niþangah Ayarlarý")]
     [SerializeField] private Transform reticleTransform;
     // groundLayer sildim çünkü kullanmýyorsun.
@@ -41,6 +47,7 @@ public class PlayerSkillController : MonoBehaviour
         // Componentleri bir kere bulup hafýzaya atýyoruz (Caching)
         if (animator == null) animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -124,6 +131,19 @@ public class PlayerSkillController : MonoBehaviour
     {
         if (currentActiveSkill == null) return;
         lastFiredSkill = currentActiveSkill;
+
+        // --- BURAYA SES KODUNU EKLÝYORUZ ---
+        if (audioSource != null)
+        {
+            if (currentActiveSkill == skillQ && soundQ != null)
+                audioSource.PlayOneShot(soundQ);
+
+            else if (currentActiveSkill == skillE && soundE != null)
+                audioSource.PlayOneShot(soundE);
+
+            else if (currentActiveSkill == skillR && soundR != null)
+                audioSource.PlayOneShot(soundR);
+        }
 
         // Hedef kaydetme
         if (reticleTransform != null && reticleTransform.gameObject.activeSelf)
