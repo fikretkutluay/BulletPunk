@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Rendering; // Required for Volume
+using UnityEngine.Rendering.Universal;
 
 public class PlayerStats : MonoBehaviour, IDamageable
 {
@@ -43,8 +45,13 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public float flashDuration = 0.1f;
     private Material flashMaterial;
 
-   
-    
+    [Header("Low Health Effects")]
+    public Volume globalVolume; // Drag your Global Volume here
+    private ChromaticAberration chromaticAberration;
+    public float maxIntensity = 1.0f; // Max distortion at 0 health
+
+
+
 
     private Animator animator;
     private GameMenuManager menuManager;
@@ -65,7 +72,70 @@ public class PlayerStats : MonoBehaviour, IDamageable
             // Use .material to create a unique instance for the player
             flashMaterial = playerSprite.material;
         }
+
+        if (globalVolume != null && globalVolume.profile.TryGet(out chromaticAberration))
+        {
+            chromaticAberration.intensity.value = 0f; // Start at 0
+        }
     }
+
+    private void Update()
+    {
+        if (isDead) return;
+
+        HandleLowHealthVfx();
+    }
+
+    private void HandleLowHealthVfx()
+    {
+        if (chromaticAberration == null) return;
+
+        float healthPercent = currentHealth / maxHealth;
+        float baseIntensity = 0f;
+
+        // Logic based on your specific thresholds
+        if (healthPercent <= 0.10f) // Under 10% health (90% gone)
+        {
+            baseIntensity = 1.0f;
+        }
+        else if (healthPercent <= 0.30f) // Under 30% health (70% gone)
+        {
+            baseIntensity = 0.50f;
+        }
+        else if (healthPercent <= 0.50f) // Under 50% health
+        {
+            baseIntensity = 0.25f;
+        }
+        else
+        {
+            baseIntensity = 0f;
+        }
+
+        if (baseIntensity > 0)
+        {
+            // The Pulse: Creates a heartbeat throb effect
+            // Mathf.Sin goes from -1 to 1, we multiply by 0.1f to keep it subtle
+            float pulse = Mathf.Sin(Time.time * 6f) * 0.1f;
+
+            // Apply the base intensity plus the pulse
+            // We use MoveTowards or Lerp so the jump between stages isn't instant and jarring
+            chromaticAberration.intensity.value = Mathf.MoveTowards(
+                chromaticAberration.intensity.value,
+                baseIntensity + pulse,
+                Time.deltaTime * 2f
+            );
+        }
+        else
+        {
+            // Return to 0 when healthy
+            chromaticAberration.intensity.value = Mathf.MoveTowards(
+                chromaticAberration.intensity.value,
+                0,
+                Time.deltaTime * 2f
+            );
+        }
+    }
+
 
     public void TakeDamage(float amount)
     {
