@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.Audio; // AudioMixer kütüphanesi eklendi
-
+using UnityEngine.Audio;
+using System.Collections;
 public class MainMenuManager : MonoBehaviour
 {
+    [Header("Cursor")]
+    public Texture2D defaultCursor;
+    public Vector2 hotSpot = Vector2.zero;
     [Header("Paneller")]
     public GameObject mainMenuPanel;
     public GameObject creditsPanel;
@@ -26,6 +29,8 @@ public class MainMenuManager : MonoBehaviour
 
     private void Start()
     {
+        Cursor.SetCursor(defaultCursor, hotSpot, CursorMode.Auto);
+        
         // 1. Kayýtlý veriyi çek (Yoksa 1 yani %100 ses gelir)
         float savedMusicVol = PlayerPrefs.GetFloat(MusicKey, 1f);
         float savedSFXVol = PlayerPrefs.GetFloat(SFXKey, 1f);

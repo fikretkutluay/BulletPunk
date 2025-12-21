@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;   // Slider eriþimi için gerekli
+using UnityEngine.Audio; // Audio Mixer eriþimi için gerekli
 
 public class GameMenuManager : MonoBehaviour
 {
@@ -7,16 +9,39 @@ public class GameMenuManager : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject gameOverPanel;
 
-    // Oyun durdu mu kontrolü
-    public static bool isGamePaused = false;
+    [Header("Ses Ayarlarý")]
+    public AudioMixer mainMixer;       // Project panelindeki MainMixer'ý buraya atacaðýz
+    public Slider musicSlider;         // Pause Menüdeki Müzik Slider'ý
+    public Slider sfxSlider;           // Pause Menüdeki SFX Slider'ý
 
-    // Geçici test tuþu (K) için deðiþken
+    // PlayerPrefs Anahtarlarý (Ana Menü ile AYNI olmalý)
+    private const string MusicKey = "MusicVolume";
+    private const string SFXKey = "SFXVolume";
+    private const string MixerMusicParam = "MusicVol";
+    private const string MixerSFXParam = "SFXVol";
+
+    public static bool isGamePaused = false;
     private bool isGameOver = false;
+
+    private void Start()
+    {
+        // 1. Sahne açýlýnca kayýtlý ses ayarlarýný yükle
+        float savedMusicVol = PlayerPrefs.GetFloat(MusicKey, 1f);
+        float savedSFXVol = PlayerPrefs.GetFloat(SFXKey, 1f);
+
+        // 2. Slider'larýn konumunu ayarla (Eðer atanmýþlarsa)
+        if (musicSlider) musicSlider.value = savedMusicVol;
+        if (sfxSlider) sfxSlider.value = savedSFXVol;
+
+        // 3. Sesi Mixer'a uygula
+        // (Oyun sahnesi yeni yüklendiðinde sesin doðru seviyede baþlamasý için þart)
+        SetMusicVolume(savedMusicVol);
+        SetSFXVolume(savedSFXVol);
+    }
 
     void Update()
     {
         // GEÇÝCÝ: K tuþuna basýnca ÖLME TESTÝ
-        // Arkadaþýn PlayerStats'ý bitirince burayý silersin.
         if (Input.GetKeyDown(KeyCode.K) && !isGameOver)
         {
             ShowGameOver();
@@ -52,22 +77,40 @@ public class GameMenuManager : MonoBehaviour
         SceneManager.LoadScene(0);
     }
 
-    // --- RESTART SORUNUNU ÇÖZEN KISIM ---
     public void RestartGame()
     {
-        // KRÝTÝK: Sahne yüklenmeden önce zamaný normale döndürmelisin.
-        // Yoksa oyun "Pause" modunda baþlar.
         Debug.Log("RESTART BUTONUNA BASILDI! SAHNE YÜKLENÝYOR...");
-
         Time.timeScale = 1f;
-
-        SceneManager.LoadScene(1);
+        // Build Settings'te aktif sahneyi yeniden yükler
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     public void ShowGameOver()
     {
         isGameOver = true;
         gameOverPanel.SetActive(true);
-        Time.timeScale = 0f; // Oyunu dondur
+        Time.timeScale = 0f;
+    }
+
+    // --- SES KONTROLÜ (Slider Eventleri) ---
+    // Bu fonksiyonlarý Slider'larýn "On Value Changed" kýsmýna baðlayacaksýn
+
+    public void SetMusicVolume(float sliderValue)
+    {
+        PlayerPrefs.SetFloat(MusicKey, sliderValue);
+        PlayerPrefs.Save();
+
+        // Logaritmik hesaplama
+        float mixerValue = Mathf.Log10(Mathf.Max(sliderValue, 0.0001f)) * 20;
+        mainMixer.SetFloat(MixerMusicParam, mixerValue);
+    }
+
+    public void SetSFXVolume(float sliderValue)
+    {
+        PlayerPrefs.SetFloat(SFXKey, sliderValue);
+        PlayerPrefs.Save();
+
+        float mixerValue = Mathf.Log10(Mathf.Max(sliderValue, 0.0001f)) * 20;
+        mainMixer.SetFloat(MixerSFXParam, mixerValue);
     }
 }
