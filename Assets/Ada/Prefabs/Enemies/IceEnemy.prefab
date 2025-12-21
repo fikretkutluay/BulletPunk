@@ -107,12 +107,22 @@ MonoBehaviour:
   moveSpeed: 5
   stoppingDistance: 8
   shootInterval: 2
+  isShotgun: 0
+  shotgunPelletCount: 3
+  shotgunSpreadAngle: 15
   projectilePrefab: {fileID: 6242481254165740418, guid: a9e1bc648631d1841aaf8dd381f48e37, type: 3}
-  flashDuration: 0.1
-  hitEffectPrefab: {fileID: 555528468544017161, guid: 1a1d34a3e41b50245b7699f9421f398c, type: 3}
+  flashDuration: 0.2
+  hitEffectRadius: 0.63
+  hitEffectPrefabs:
+  - {fileID: 3645522822976805287, guid: 99d3a993cf580e6409b292eafb205ebe, type: 3}
+  - {fileID: 7273307749629735230, guid: 2af8d76804531e840b9a026b98dc5d3d, type: 3}
+  - {fileID: 1992454573130426520, guid: 5f04f5565506e8949993149e434d072c, type: 3}
+  - {fileID: 5232402537905560773, guid: 06407dfa85870414381c7f5e1c1de020, type: 3}
   expPrefab: {fileID: 130401510781278458, guid: 7b37200b75a16e841b7dd80a70884963, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
   healthBarOffsetY: 0.6
+  knockbackForce: 5
+  knockbackDuration: 0.2
 --- !u!61 &8031125311632892104
 BoxCollider2D:
   m_ObjectHideFlags: 0

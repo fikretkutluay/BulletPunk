@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7882003293223327842}
   - component: {fileID: -962639626728405907}
   - component: {fileID: -7587528481825222756}
+  - component: {fileID: 3753790240775364192}
   m_Layer: 0
   m_Name: yesilexp
   m_TagString: Untagged
@@ -102,7 +103,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expAmount: 10
-  attractSpeed: 5
 --- !u!61 &-7587528481825222756
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,3 +149,25 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.65625, y: 0.46875}
   m_EdgeRadius: 0
+--- !u!95 &3753790240775364192
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130401510781278458}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d295d5aa957a7b440a215253a64ca68f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

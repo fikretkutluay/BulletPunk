@@ -15,6 +15,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [Header("Can Ayarlarý")]
     public float maxHealth = 100f;
     public float currentHealth;
+    public float healthIncreaseMult =1.5f;
 
     [Header("XP Ayarlarý")]
     public float currentXP = 0f;
@@ -99,7 +100,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         if (LevelUpManager.Instance != null)
             LevelUpManager.Instance.ShowLevelUpMenu();
-
+        maxHealth *= healthIncreaseMult;
         currentHealth = maxHealth;
         UpdateUI();
     }

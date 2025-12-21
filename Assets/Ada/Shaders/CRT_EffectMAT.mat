@@ -38,6 +38,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _Blur_Offset: 0.001046
+    - _Curve: 0.2
     - _Number_of_Scan_Lines: 300
     - _Screen_Line_Speed: 0.05
     - _Screen_Line_Speed_1: 0.01

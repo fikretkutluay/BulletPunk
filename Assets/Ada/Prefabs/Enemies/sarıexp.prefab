@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2904484275578783152}
   - component: {fileID: -8208958586580557863}
   - component: {fileID: -6970852372505909875}
+  - component: {fileID: 504895948517211509}
   m_Layer: 0
   m_Name: "sar\u0131exp"
   m_TagString: Untagged
@@ -102,7 +103,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expAmount: 10
-  attractSpeed: 5
 --- !u!61 &-6970852372505909875
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,3 +149,25 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.65625, y: 0.46875}
   m_EdgeRadius: 0
+--- !u!95 &504895948517211509
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177255402923033108}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 766892ac375ca2743a9a449c5e513e80, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

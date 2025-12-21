@@ -23,6 +23,16 @@ public class CyberDragon : MonoBehaviour, IDamageable
     public float shootInterval = 2f;
     public int shootEveryXSegments = 4;
 
+    [Header("Circling Attack Settings")]
+    public float circleRadius = 5f;
+    public float circleSpeed = 2f;
+    public float circlingDuration = 5f;
+    public float chanceToCircle = 0.2f; // 20% chance after reaching a target
+
+    private bool isCircling = false;
+    private float circleTimer = 0f;
+    private float currentCircleAngle = 0f;
+
     [Header("Visual Effects (Shader)")]
     public float flashDuration = 0.1f;
     private List<Material> allMaterials = new List<Material>();
@@ -128,25 +138,32 @@ public class CyberDragon : MonoBehaviour, IDamageable
 
     void MoveHead()
     {
-        float distToPoint = Vector3.Distance(transform.position, currentTargetPoint);
-        if (distToPoint < arrivalDistance) SetNewTargetPoint();
+        if (isCircling)
+        {
+            HandleCirclingAttack();
+        }
+        else
+        {
+            // Your normal pathfinding logic
+            float distToPoint = Vector3.Distance(transform.position, currentTargetPoint);
+            if (distToPoint < arrivalDistance)
+            {
+                // When arriving, decide if we should start circling
+                if (Random.value < chanceToCircle) StartCircling();
+                else SetNewTargetPoint();
+            }
 
-        Vector3 dir = (currentTargetPoint - transform.position).normalized;
-        Vector3 sideDir = new Vector3(-dir.y, dir.x, 0);
-        Vector3 wiggle = sideDir * Mathf.Sin(timeCounter * swingSpeed) * swingAmount;
+            Vector3 dir = (currentTargetPoint - transform.position).normalized;
+            Vector3 sideDir = new Vector3(-dir.y, dir.x, 0);
+            Vector3 wiggle = sideDir * Mathf.Sin(timeCounter * swingSpeed) * swingAmount;
+            transform.position += (dir * moveSpeed + wiggle) * Time.deltaTime;
+        }
 
-        transform.position += (dir * moveSpeed + wiggle) * Time.deltaTime;
-
-        // --- UPDATED ROTATION LOGIC ---
+        // Always look at player (your existing logic)
         if (player != null)
         {
-            // 1. Calculate direction specifically toward the PLAYER
             Vector3 dirToPlayer = (player.position - transform.position).normalized;
-
-            // 2. Calculate the angle (adding -90 if your sprite faces 'Up' by default)
             float angle = Mathf.Atan2(dirToPlayer.y, dirToPlayer.x) * Mathf.Rad2Deg - 90f;
-
-            // 3. Apply the rotation (Slerp makes the turn smooth)
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 0, angle), Time.deltaTime * 10f);
         }
     }
@@ -220,6 +237,36 @@ public class CyberDragon : MonoBehaviour, IDamageable
             projGO.transform.rotation = Quaternion.Euler(0, 0, angle);
             proj.targetKey = ControlType.Skill2;
         }
+    }
+
+    void StartCircling()
+    {
+        isCircling = true;
+        circleTimer = circlingDuration;
+
+        // Calculate starting angle based on current position relative to player
+        Vector2 dir = (transform.position - player.position).normalized;
+        currentCircleAngle = Mathf.Atan2(dir.y, dir.x);
+    }
+
+    void HandleCirclingAttack()
+    {
+        circleTimer -= Time.deltaTime;
+        if (circleTimer <= 0)
+        {
+            isCircling = false;
+            SetNewTargetPoint(); // Go back to normal
+            return;
+        }
+
+        // Orbit Math
+        currentCircleAngle += circleSpeed * Time.deltaTime;
+
+        Vector3 offset = new Vector3(Mathf.Cos(currentCircleAngle), Mathf.Sin(currentCircleAngle), 0) * circleRadius;
+        Vector3 targetCirclePos = player.position + offset;
+
+        // Move toward the calculated orbit position
+        transform.position = Vector3.Lerp(transform.position, targetCirclePos, Time.deltaTime * moveSpeed);
     }
 
     public void TakeDamage(float amount)

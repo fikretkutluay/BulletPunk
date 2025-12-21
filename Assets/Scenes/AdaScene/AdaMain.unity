@@ -922,10 +922,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -7491217008467730819, guid: 18ca67dbc24fe0840bf9f1b22736ccdc, type: 3}
-      propertyPath: expAmount
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 4721015224064186507, guid: 18ca67dbc24fe0840bf9f1b22736ccdc, type: 3}
       propertyPath: m_Name
       value: maviexp
@@ -1674,10 +1670,6 @@ PrefabInstance:
     - target: {fileID: 1288201281525065100, guid: 952a6fbf562e1e74abcbb011047cb66f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2748481391071821073, guid: 952a6fbf562e1e74abcbb011047cb66f, type: 3}
-      propertyPath: expAmount
-      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6204467049555052510, guid: 952a6fbf562e1e74abcbb011047cb66f, type: 3}
       propertyPath: m_Name

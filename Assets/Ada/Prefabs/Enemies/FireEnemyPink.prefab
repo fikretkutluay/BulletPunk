@@ -109,12 +109,22 @@ MonoBehaviour:
   moveSpeed: 2
   stoppingDistance: 5
   shootInterval: 0.1
+  isShotgun: 0
+  shotgunPelletCount: 3
+  shotgunSpreadAngle: 15
   projectilePrefab: {fileID: 3580863725872959338, guid: 979096c2f5cb89d4daedd15cf9ba0a7a, type: 3}
-  flashDuration: 0.1
-  hitEffectPrefab: {fileID: 555528468544017161, guid: 4772770c29cba0f4ebfca4a665ae3427, type: 3}
+  flashDuration: 0.2
+  hitEffectRadius: 0.54
+  hitEffectPrefabs:
+  - {fileID: 3645522822976805287, guid: 99d3a993cf580e6409b292eafb205ebe, type: 3}
+  - {fileID: 7273307749629735230, guid: 2af8d76804531e840b9a026b98dc5d3d, type: 3}
+  - {fileID: 1992454573130426520, guid: 5f04f5565506e8949993149e434d072c, type: 3}
+  - {fileID: 5232402537905560773, guid: 06407dfa85870414381c7f5e1c1de020, type: 3}
   expPrefab: {fileID: 2266597332171287316, guid: ae835597f48dbf349a5db73febaf4d52, type: 3}
   healthBarPrefab: {fileID: 6267155873167033784, guid: cba841aa627559e408222f9421ecef63, type: 3}
   healthBarOffsetY: 0.6
+  knockbackForce: 5
+  knockbackDuration: 0.2
 --- !u!95 &-6457936963552742667
 Animator:
   serializedVersion: 7
