@@ -156,28 +156,45 @@ public class PlayerSkillController : MonoBehaviour
     public void SpawnProjectileFromAnim()
     {
         if (lastFiredSkill == null) return;
-        
+
+        // --- FETCH MULTIPLIERS FROM PLAYERSTATS ---
+        PlayerStats stats = GetComponent<PlayerStats>();
+        float finalDamage = lastFiredSkill.damage;
+
+        // Apply specific multiplier based on which skill was fired
+        if (stats != null)
+        {
+            if (lastFiredSkill == skillQ) finalDamage *= stats.qDamageMultiplier;
+            else if (lastFiredSkill == skillE) finalDamage *= stats.eDamageMultiplier;
+            else if (lastFiredSkill == skillR) finalDamage *= stats.rDamageMultiplier;
+        }
+
         // >>> SKILL R (ULTIMATE) <<<
         if (lastFiredSkill == skillR)
         {
-            Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
+            if (lastFiredSkill == skillR)
+            {
+                // Trigger Cinemachine Shake
+                if (CameraShake.Instance != null)
+                {
+                    CameraShake.Instance.GenerateShake();
+                }
 
-            // 1. FÝLTRE: Sadece "Enemy" layerýndakileri getir (Performans için)
-            // "enemyLayer" deðiþkenini Inspector'dan seçmeyi unutma!
+
+            }
+            Vector2 facingDir = spriteRenderer.flipX ? Vector2.left : Vector2.right;
             Collider2D[] allHits = Physics2D.OverlapCircleAll(transform.position, ultiRadius, enemyLayer);
 
             foreach (Collider2D hit in allHits)
             {
-                // 2. AÇI KONTROLÜ
                 Vector2 dirToTarget = (hit.transform.position - transform.position).normalized;
                 if (Vector2.Angle(facingDir, dirToTarget) < ultiAngle / 2f)
                 {
-                    // 3. INTERFACE KONTROLÜ (Caný var mý?)
                     IDamageable damageable = hit.GetComponentInParent<IDamageable>();
-
                     if (damageable != null)
                     {
-                        damageable.TakeDamage(lastFiredSkill.damage);
+                        // Use finalDamage (with multiplier) instead of skill data damage
+                        damageable.TakeDamage(finalDamage);
                     }
                 }
             }
@@ -191,7 +208,8 @@ public class PlayerSkillController : MonoBehaviour
                 LightningSpell spellScript = lightningObj.GetComponent<LightningSpell>();
                 if (spellScript != null)
                 {
-                    spellScript.Initialize(lastFiredSkill.damage, 3.0f);
+                    // Pass finalDamage
+                    spellScript.Initialize(finalDamage, 3.0f);
                 }
             }
         }
@@ -207,12 +225,12 @@ public class PlayerSkillController : MonoBehaviour
                 Projectile projectileScript = projectileObj.GetComponent<Projectile>();
                 if (projectileScript != null)
                 {
-                    projectileScript.Initialize(direction, 15f, lastFiredSkill.damage);
+                    // Pass finalDamage
+                    projectileScript.Initialize(direction, 15f, finalDamage);
                 }
             }
         }
     }
-
     // Cooldown
     private void HandleCooldowns()
     {
