@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerMovement : MonoBehaviour
 {
+
+
     [Header("Hareket Ayarlarý")]
     [SerializeField] private float moveSpeed = 5f;
 
@@ -47,6 +49,11 @@ public class PlayerMovement : MonoBehaviour
         // Katman numaralarýný alýyoruz
         playerLayer = gameObject.layer;
         enemyLayer = LayerMask.NameToLayer(enemyLayerName);
+    }
+    void Start()
+    {
+        // Hides the cursor completely
+        Cursor.visible = false;
     }
 
     // Güvenlik: Obje kapanýrsa çarpýþmayý düzelt
@@ -146,4 +153,18 @@ public class PlayerMovement : MonoBehaviour
         if (enemyLayer != -1 && invincibleDuringDash)
             Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
     }
+
+    public void IncreaseMoveSpeed(float amount)
+    {
+        moveSpeed += amount;
+        if (moveSpeed > 15f) // Cap the speed at 15
+        {
+            moveSpeed = 15f;
+        }
+    }
+    public float GetCurrentSpeed()
+    {
+        return moveSpeed;
+    }
+
 }

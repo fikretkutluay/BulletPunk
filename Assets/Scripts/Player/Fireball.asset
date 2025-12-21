@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   skillName: Wave
   icon: {fileID: 0}
-  cooldown: 2
+  cooldown: 0.5
   projectilePrefab: {fileID: 2189955317819414856, guid: a6718dc4fcbc8c8479d96a97c6c024d2, type: 3}
   damage: 30
   minRange: 2

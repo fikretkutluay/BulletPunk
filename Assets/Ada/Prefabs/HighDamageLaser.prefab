@@ -105,9 +105,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetKey: 0
   lockDuration: 2
-  damage: 10
+  damage: 5
   speed: 10
-  randomLockChance: 0.22
+  randomLockChance: 0.01
 --- !u!50 &7492795626933966601
 Rigidbody2D:
   serializedVersion: 5

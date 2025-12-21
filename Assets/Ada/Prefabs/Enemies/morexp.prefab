@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5314207431857417192}
   - component: {fileID: 3584425341879755359}
   - component: {fileID: 5321735319294525601}
+  - component: {fileID: 1136119885504064821}
   m_Layer: 0
   m_Name: morexp
   m_TagString: Untagged
@@ -101,8 +102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e2ff09f9d9729e4d9fd9596c654d05e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  expAmount: 10
-  attractSpeed: 5
+  expAmount: 50
 --- !u!61 &5321735319294525601
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,3 +149,25 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.65625, y: 0.46875}
   m_EdgeRadius: 0
+--- !u!95 &1136119885504064821
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2266597332171287316}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: afa9d76558ce02d4d8ac2ac73db3c93d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

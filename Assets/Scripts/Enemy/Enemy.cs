@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public enum EnemyType { Fire, Electric, Toxic, Ice }
 
@@ -12,6 +13,20 @@ public class Enemy : MonoBehaviour, IDamageable
     public float moveSpeed = 2f;
     public float stoppingDistance = 5f;
     public float shootInterval = 2f;
+    private float lastHitTime;
+    private float hitCooldown = 0.05f;
+
+    [Header("Attack Mode")]
+    public bool isShotgun = false;
+    public int shotgunPelletCount = 3;
+    public float shotgunSpreadAngle = 15f;
+
+    [Header("Difficulty Scaling")]
+    public float baseDamage = 10f;             // The starting damage
+    public float damageIncreaseInterval = 60f; // How often it doubles (60s)
+
+    private static float currentDamageMultiplier = 1f; // Shared by ALL enemies
+    private static float globalTimer = 0f;             // Shared timer
 
     [Header("References")]
     public GameObject projectilePrefab;
@@ -19,39 +34,53 @@ public class Enemy : MonoBehaviour, IDamageable
     private float shootTimer;
 
     [Header("Visual Effects")]
-    public float flashDuration = 0.1f;
+    public float flashDuration = 0.3f;
     private Material flashMaterial;
-    private SpriteRenderer spriteRenderer;
-    public GameObject hitEffectPrefab;
+    private SpriteRenderer spriteRenderer; 
+    public float hitEffectRadius = 0.5f;
+    public List<GameObject> hitEffectPrefabs = new List<GameObject>();
 
     [Header("Drops & UI")]
     public GameObject expPrefab;
     public GameObject healthBarPrefab;
     private Slider healthSlider;
-
-    // Change this value to move the bar up or down
     [SerializeField] private float healthBarOffsetY = 0.6f;
+
+    [Header("Knockback Settings")]
+    public float knockbackForce = 5f;
+    public float knockbackDuration = 0.2f;
+    private bool isKnockedBack = false;
+    private Rigidbody2D rb;
+
+    [Header("Drops & UI")]
+    public GameObject healthPrefab; // Drag your Health Pickup prefab here
+    [Range(0, 100)]
+    public float healthDropChance = 20f;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
-        // Using .material creates a unique instance for this enemy
+        // .material creates a unique instance for this enemy so flashing doesn't affect all enemies
         flashMaterial = spriteRenderer.material;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Start()
     {
+        // RESET Scaling when the scene starts/restarts
+        currentDamageMultiplier = 1f;
+        globalTimer = 0f;
+
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         if (p != null) player = p.transform;
 
         SetupHealthBar();
     }
 
-    void SetupHealthBar()
+    private void SetupHealthBar()
     {
         if (healthBarPrefab != null)
         {
-            // We spawn it closer (0.6f instead of 1.5f)
             GameObject hb = Instantiate(healthBarPrefab, transform.position + Vector3.up * healthBarOffsetY, Quaternion.identity, transform);
             healthSlider = hb.GetComponentInChildren<Slider>();
 
@@ -63,20 +92,37 @@ public class Enemy : MonoBehaviour, IDamageable
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        if (player == null) return;
-
-        // 1. FLIP ÝÞLEMÝNÝ BURADA YAPIYORUZ
-        HandleSpriteFlip();
+        if (player == null || isKnockedBack) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
         if (distanceToPlayer > stoppingDistance)
         {
             Vector2 direction = (player.position - transform.position).normalized;
-            transform.Translate(direction * moveSpeed * Time.deltaTime);
+            rb.linearVelocity = direction * moveSpeed;
         }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
+    }
+
+    private void Update()
+    {
+        if (player == null) return;
+
+        // --- HANDLE GLOBAL DAMAGE SCALING ---
+        globalTimer += Time.deltaTime;
+        if (globalTimer >= damageIncreaseInterval)
+        {
+            currentDamageMultiplier *= 2f; // Doubling the damage
+            globalTimer = 0f;              // Reset the timer
+            Debug.Log("Difficulty Increased! New Multiplier: x" + currentDamageMultiplier);
+        }
+
+        HandleSpriteFlip();
 
         shootTimer += Time.deltaTime;
         if (shootTimer >= shootInterval)
@@ -85,24 +131,19 @@ public class Enemy : MonoBehaviour, IDamageable
             shootTimer = 0;
         }
 
-        // Keep UI from flipping if you decide to flip the sprite later
-        if (healthSlider != null) healthSlider.transform.parent.rotation = Quaternion.identity;
+        // Keeps the UI from flipping if you decide to flip the sprite
+        if (healthSlider != null)
+            healthSlider.transform.parent.rotation = Quaternion.identity;
     }
 
-    // YENÝ EKLENEN FONKSÝYON
     void HandleSpriteFlip()
     {
-        // Eðer oyuncu düþmanýn saðýndaysa (x deðeri büyükse)
         if (player.position.x > transform.position.x)
         {
-            // Sprite saða baksýn (flipX kapalý)
-            // NOT: Eðer sprite'ýn orijinali sola bakýyorsa burayý true yap.
             spriteRenderer.flipX = true;
         }
-        // Eðer oyuncu düþmanýn solundaysa (x deðeri küçükse)
         else if (player.position.x < transform.position.x)
         {
-            // Sprite sola baksýn (flipX açýk)
             spriteRenderer.flipX = false;
         }
     }
@@ -111,41 +152,115 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         if (projectilePrefab == null) return;
 
-        GameObject projGO = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+        Vector2 baseDir = (player.position - transform.position).normalized;
+        float baseAngle = Mathf.Atan2(baseDir.y, baseDir.x) * Mathf.Rad2Deg - 90f;
+
+        if (isShotgun)
+        {
+            // Calculate start angle to center the fan on the player
+            float startAngle = baseAngle - (shotgunSpreadAngle * (shotgunPelletCount - 1)) / 2f;
+
+            for (int i = 0; i < shotgunPelletCount; i++)
+            {
+                float currentAngle = startAngle + (i * shotgunSpreadAngle);
+                SpawnProjectile(currentAngle);
+            }
+        }
+        else
+        {
+            SpawnProjectile(baseAngle);
+        }
+    }
+
+    void SpawnProjectile(float angle)
+    {
+        GameObject projGO = Instantiate(projectilePrefab, transform.position, Quaternion.Euler(0, 0, angle));
         EnemyProjectile proj = projGO.GetComponent<EnemyProjectile>();
 
-        Vector2 dir = (player.position - transform.position).normalized;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
-        projGO.transform.rotation = Quaternion.Euler(0, 0, angle);
-
-        switch (type)
+        if (proj != null)
         {
-            case EnemyType.Fire: proj.targetKey = ControlType.Skill1; break;
-            case EnemyType.Electric: proj.targetKey = ControlType.Skill2; break;
-            case EnemyType.Toxic: proj.targetKey = ControlType.Skill1; break;
-            case EnemyType.Ice: proj.targetKey = ControlType.Dash; break;
+            proj.damage = baseDamage * currentDamageMultiplier;
+            switch (type)
+            {
+                case EnemyType.Fire: proj.targetKey = ControlType.Skill1; break;
+                case EnemyType.Electric: proj.targetKey = ControlType.Skill2; break;
+                case EnemyType.Toxic: proj.targetKey = ControlType.Skill1; break; // Assumed Skill1
+                case EnemyType.Ice: proj.targetKey = ControlType.Dash; break;
+            }
         }
     }
 
     public void TakeDamage(float amount)
     {
+        // 1. Cooldown check
+        if (Time.time < lastHitTime + hitCooldown) return;
+        lastHitTime = Time.time;
+
         health -= amount;
         if (healthSlider != null) healthSlider.value = health;
 
+        // --- RANDOMIZED HIT EFFECT FROM LIST ---
+        if (hitEffectPrefabs != null && hitEffectPrefabs.Count > 0)
+        {
+            // 1. Pick a random prefab from the list
+            int randomIndex = Random.Range(0, hitEffectPrefabs.Count);
+            GameObject selectedPrefab = hitEffectPrefabs[randomIndex];
+
+            if (selectedPrefab != null)
+            {
+                // 2. Calculate random spawn position
+                Vector2 randomOffset = Random.insideUnitCircle * hitEffectRadius;
+                Vector3 spawnPos = new Vector3(
+                    transform.position.x + randomOffset.x,
+                    transform.position.y + randomOffset.y,
+                    -1f
+                );
+
+                // 3. Spawn the selected effect with random rotation
+                GameObject effect = Instantiate(selectedPrefab, spawnPos, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+
+                // 4. Cleanup
+                Destroy(effect, 1f);
+            }
+        }
+
+        // 3. Apply Knockback
+        if (player != null)
+        {
+            Vector2 knockbackDir = (transform.position - player.position).normalized;
+            StartCoroutine(KnockbackRoutine(knockbackDir));
+        }
+
+        // 4. Visual Flash
         StartCoroutine(DamageFlashRoutine());
 
-        if (hitEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(hitEffectPrefab, transform.position, Quaternion.identity);
-            // Optional: Color particles here as we did before
-            Destroy(effect, 1f);
-        }
+        // --- I REMOVED THE SECOND SPAWN BLOCK THAT WAS HERE ---
 
+        // 5. Death Logic
         if (health <= 0)
         {
+            // 1. Drop Experience (Existing logic)
             if (expPrefab != null) Instantiate(expPrefab, transform.position, Quaternion.identity);
+
+            // 2. Drop Health based on chance
+            float randomRoll = Random.Range(0f, 100f);
+            if (randomRoll <= healthDropChance && healthPrefab != null)
+            {
+                Instantiate(healthPrefab, transform.position, Quaternion.identity);
+            }
+
             Destroy(gameObject);
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // Set the color of the gizmo
+        Gizmos.color = Color.red;
+
+        // Draw a wire circle representing the hit effect radius
+        // We use transform.position as the center and hitEffectRadius as the radius
+        Gizmos.DrawWireSphere(transform.position, hitEffectRadius);
     }
 
     private IEnumerator DamageFlashRoutine()
@@ -153,5 +268,16 @@ public class Enemy : MonoBehaviour, IDamageable
         flashMaterial.SetFloat("_FlashAmount", 0.259f);
         yield return new WaitForSeconds(flashDuration);
         flashMaterial.SetFloat("_FlashAmount", 0f);
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 direction)
+    {
+        isKnockedBack = true;
+        rb.linearVelocity = direction * knockbackForce;
+
+        yield return new WaitForSeconds(knockbackDuration);
+
+        isKnockedBack = false;
+        rb.linearVelocity = Vector2.zero;
     }
 }
