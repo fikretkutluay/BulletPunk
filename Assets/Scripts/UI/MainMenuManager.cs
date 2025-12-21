@@ -9,7 +9,7 @@ public class MainMenuManager : MonoBehaviour
     public void PlayGame()
     {
         // "GameScene" senin oyun sahnenin tam adý olmalý!
-        SceneManager.LoadScene("InGameScene");
+        SceneManager.LoadScene(1);
     }
 
     // Çýkýþ Butonu buna baðlanacak

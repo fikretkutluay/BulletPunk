@@ -1,7 +1,8 @@
 using UnityEngine;
-using UnityEngine.UI; // UI kullanacaðýz
-
+using UnityEngine.UI;
 using TMPro;
+using System.Collections;
+
 public class PlayerStats : MonoBehaviour, IDamageable
 {
     [Header("Skill Bonuses")]
@@ -21,23 +22,30 @@ public class PlayerStats : MonoBehaviour, IDamageable
     [Header("UI Referanslarý")]
     public Slider healthSlider;
     public Slider xpSlider;
-    public TextMeshProUGUI levelText; // Level 1, Level 2 yazýsý için (Opsiyonel)
+    public TextMeshProUGUI levelText;
+
+    // --- ÖLÜM SÝSTEMÝ ---
+    private Animator animator;
+    private GameMenuManager menuManager;
+    private bool isDead = false;
 
     private void Start()
     {
         currentHealth = maxHealth;
+        animator = GetComponent<Animator>();
+        // Unity 6 için FindFirstObjectByType
+        menuManager = FindFirstObjectByType<GameMenuManager>();
         UpdateUI();
     }
 
-    // IDamageable'dan gelen hasar alma fonksiyonu
     public void TakeDamage(float amount)
     {
-        // Check if the player is currently dashing and invincible
+        if (isDead) return;
+
         PlayerMovement movement = GetComponent<PlayerMovement>();
         if (movement != null && movement.IsInvincible)
         {
-            Debug.Log("Dash used! Damage avoided.");
-            return; // Exit the function without taking damage
+            return;
         }
 
         currentHealth -= amount;
@@ -53,6 +61,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     public void Heal(float amount)
     {
+        if (isDead) return;
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
         UpdateUI();
@@ -60,60 +69,92 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
     public void GainXP(float amount)
     {
+        if (isDead) return;
         currentXP += amount;
-
-        // Use a 'while' loop instead of 'if' in case the boss gives 
-        // enough XP for 2 or 3 levels at once!
         while (currentXP >= xpToNextLevel)
         {
             LevelUp();
         }
         UpdateUI();
     }
+
     private void LevelUp()
     {
         currentXP -= xpToNextLevel;
         currentLevel++;
         xpToNextLevel *= 1.2f;
 
-        // Call the Level Up Menu
         if (LevelUpManager.Instance != null)
-        {
             LevelUpManager.Instance.ShowLevelUpMenu();
-        }
 
         currentHealth = maxHealth;
         UpdateUI();
-
-        if (LevelUpManager.Instance != null)
-        {
-            LevelUpManager.Instance.ShowLevelUpMenu();
-        }
-
     }
 
     private void UpdateUI()
     {
-        if (healthSlider != null)
-        {
-            healthSlider.maxValue = maxHealth;
-            healthSlider.value = currentHealth;
-        }
-
-        if (xpSlider != null)
-        {
-            xpSlider.maxValue = xpToNextLevel;
-            xpSlider.value = currentXP;
-        }
-
-        if (levelText != null)
-            levelText.text = "LVL " + currentLevel;
+        if (healthSlider != null) { healthSlider.maxValue = maxHealth; healthSlider.value = currentHealth; }
+        if (xpSlider != null) { xpSlider.maxValue = xpToNextLevel; xpSlider.value = currentXP; }
+        if (levelText != null) levelText.text = "LVL " + currentLevel;
     }
 
     private void Die()
     {
-        Debug.Log("OYUNCU ÖLDÜ! GAME OVER.");
-        // Buraya Game Over ekraný kodu veya sahne yenileme gelecek
-        // Time.timeScale = 0;
+        if (isDead) return;
+        isDead = true;
+        StartCoroutine(DeathSequence());
+    }
+
+    private IEnumerator DeathSequence()
+    {
+        Debug.Log("OYUNCU ÖLDÜ - HERKES DURSUN!");
+
+        // 1. OYUNCUYU KÝLÝTLE
+        if (GetComponent<PlayerMovement>()) GetComponent<PlayerMovement>().enabled = false;
+        if (GetComponent<PlayerSkillController>()) GetComponent<PlayerSkillController>().enabled = false;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+
+        if (GetComponent<Collider2D>()) GetComponent<Collider2D>().enabled = false;
+
+        // 2. TÜM DÜÞMANLARI BUL VE DONDUR (YENÝ KISIM)
+        // Sahnedeki tüm "Enemy" scriptlerini buluyoruz
+        Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+
+        foreach (Enemy enemy in enemies)
+        {
+            // Düþmanýn beynini (Update) kapat
+            enemy.enabled = false;
+
+            // Varsa animasyonunu dondur
+            if (enemy.GetComponent<Animator>()) enemy.GetComponent<Animator>().enabled = false;
+
+            // Fiziksel olarak kaymasýný engelle
+            if (enemy.GetComponent<Rigidbody2D>()) enemy.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        }
+
+        // 3. ANÝMASYONU OYNAT
+        if (animator != null)
+        {
+            animator.SetTrigger("Die");
+        }
+
+        // 4. BEKLEME (1.5 saniye - Animasyon bitene kadar)
+        yield return new WaitForSeconds(3f);
+
+        // 5. GAME OVER PANELÝ
+        if (menuManager != null)
+        {
+            menuManager.ShowGameOver();
+        }
+        else
+        {
+            Time.timeScale = 0;
+        }
     }
 }
