@@ -28,7 +28,7 @@ BulletPunk/
 │   │   ├── Interfaces/ # IDamagable and IDebuffable systems
 │   │   └── Managers/   # Input and Game state management
 │   └── Settings/       # URP profiles and renderer settings
-
+```
 ## 🚀 Key Technical Highlights
 
 ### Dynamic Input Decay
@@ -37,9 +37,6 @@ The project leverages the **Unity Input System** to manage player controls. I im
 ### Scalable Damage System
 By using `IDamagable` and `IDebuffable`, the combat system is completely decoupled. This allowed us to quickly iterate during the jam, adding new enemy types or environmental hazards that interact with the player's health and control state without breaking the core codebase.
 
-## 📦 Installation & Play
-This project is currently optimized for **Windows PC**.
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/fikretkutluay/BulletPunk.git](https://github.com/fikretkutluay/BulletPunk.git)
+## 🔗 Play on Itch.io
+You can play the final Jam build and see the "Losing Control" mechanic in action here:
+**👉 Play BulletPunk on [itch.io](https://fikretkutluay.itch.io/bullet-punk)**
