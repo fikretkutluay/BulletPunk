@@ -12,7 +12,7 @@ In line with the jam theme, our character's control scheme is dynamic and fragil
 * **Interface-Based Interaction:** Robust health and damage systems using decoupled C# interfaces.
 
 ## 🛠 Technical Stack
-* **Engine:** Unity 2022.3 (LTS)
+* **Engine:** Unity 6.0 (LTS)
 * **Render Pipeline:** Universal Render Pipeline (URP)
 * **Scripting:** C# (.NET Standard)
 * **Input System:** Unity Input System (optimized for Windows)
