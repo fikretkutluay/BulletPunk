@@ -30,8 +30,16 @@ BulletPunk/
 │   └── Settings/       # URP profiles and renderer settings
 
 ## 🚀 Key Technical Highlights
-* Dynamic Input Decay
-*The project leverages the Unity Input System to manage player controls. I implemented a custom logic that listens to damage events through the **IDamagable** interface. When certain damage thresholds are met, the **InputManager** dynamically disables specific action maps, directly simulating the "Losing Control" theme.
 
-*Scalable Damage System
-* By using **IDamagable** and **IDebuffable**, the combat system is completely decoupled. This allowed us to quickly iterate during the jam, adding new enemy types or environmental hazards that interact with the player's health and control state without breaking the core codebase.
+### Dynamic Input Decay
+The project leverages the **Unity Input System** to manage player controls. I implemented a custom logic that listens to damage events through the `IDamagable` interface. When certain damage thresholds are met, the `InputManager` dynamically disables specific action maps, directly simulating the "Losing Control" theme.
+
+### Scalable Damage System
+By using `IDamagable` and `IDebuffable`, the combat system is completely decoupled. This allowed us to quickly iterate during the jam, adding new enemy types or environmental hazards that interact with the player's health and control state without breaking the core codebase.
+
+## 📦 Installation & Play
+This project is currently optimized for **Windows PC**.
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/fikretkutluay/BulletPunk.git](https://github.com/fikretkutluay/BulletPunk.git)
